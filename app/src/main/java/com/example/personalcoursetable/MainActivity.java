@@ -29,6 +29,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
@@ -50,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String[][] courseNameArray = new String[7][10];//课程名称
     private int Permission_WRITE_EXTERNAL_STORAGE = 0x001;//读写权限
     private File file;//手机存储文件
+    private boolean havePermission=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         /*权限 ->*/
         if (ContextCompat.checkSelfPermission(MainActivity.this, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{WRITE_EXTERNAL_STORAGE}, Permission_WRITE_EXTERNAL_STORAGE);
+        }else{
+            havePermission=true;
         }/*<- 权限*/
         /*布局 ->*/
         layoutParams = new LinearLayout.LayoutParams(
@@ -75,14 +82,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         /*<- 布局*/
         /*文件读写 ->*/
         file = new File("/sdcard/CourseJsonData.txt");//文件位置
-        if(file.exists()) {
+        if(file.exists()&&havePermission) {
             JsonString=getJsonStringFromMemory();
         }else {
             JsonString = getLocalJson("coursetable_json.txt");//读取本地JSON
             saveData();//将JSON数据写入手机存储
         }/*<- 文件读写*/
+        //addJson();
         getCourseArray();//获取课表数据
-        getCourseNameArray();//获取课程名称
         addButton();//添加Button
     }
 
@@ -224,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return JsonString;
     }
 
-    /*获取课表数据，置入courseArray*/
+    /*获取课表数据，置入courseArray和courseNameArray*/
     private void getCourseArray() {
         int i;
         Gson gson = new Gson();
@@ -233,6 +240,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             for (i = 0; i < 10; i++) {
                 if (course.getMondayCourse() != null) {
                     if (course.getMondayCourse().get(i) != null) {
+                        courseNameArray[0][i] = course.getMondayCourse().get(i).getCourseName();
                         courseArray[0][i] = "时间：" + course.getMondayCourse().get(i).getCourseWeek().toString() + "\n"
                                 + "地点：" + course.getMondayCourse().get(i).getCoursePlace() + "\n"
                                 + "教师：" + course.getMondayCourse().get(i).getCourseTeacher() + "\n";
@@ -244,6 +252,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             for (i = 0; i < 10; i++) {
                 if (course.getTuesdayCourse() != null) {
                     if (course.getTuesdayCourse().get(i) != null) {
+                        courseNameArray[1][i] = course.getTuesdayCourse().get(i).getCourseName();
                         courseArray[1][i] = "时间：" + course.getTuesdayCourse().get(i).getCourseWeek().toString() + "\n"
                                 + "地点：" + course.getTuesdayCourse().get(i).getCoursePlace() + "\n"
                                 + "教师：" + course.getTuesdayCourse().get(i).getCourseTeacher() + "\n";
@@ -256,6 +265,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             for (i = 0; i < 10; i++) {
                 if (course.getWednesdayCourse() != null) {
                     if (course.getWednesdayCourse().get(i) != null) {
+                        courseNameArray[2][i] = course.getWednesdayCourse().get(i).getCourseName();
                         courseArray[2][i] = "时间：" + course.getWednesdayCourse().get(i).getCourseWeek().toString() + "\n"
                                 + "地点：" + course.getWednesdayCourse().get(i).getCoursePlace() + "\n"
                                 + "教师：" + course.getWednesdayCourse().get(i).getCourseTeacher() + "\n";
@@ -267,6 +277,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             for (i = 0; i < 10; i++) {
                 if (course.getTuesdayCourse() != null) {
                     if (course.getThursdayCourse().get(i) != null) {
+                        courseNameArray[3][i] = course.getThursdayCourse().get(i).getCourseName();
                         courseArray[3][i] = "时间：" + course.getThursdayCourse().get(i).getCourseWeek().toString() + "\n"
                                 + "地点：" + course.getThursdayCourse().get(i).getCoursePlace() + "\n"
                                 + "教师：" + course.getThursdayCourse().get(i).getCourseTeacher() + "\n";
@@ -278,6 +289,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             for (i = 0; i < 10; i++) {
                 if (course.getFridayCourse() != null) {
                     if (course.getFridayCourse().get(i) != null) {
+                        courseNameArray[4][i] = course.getFridayCourse().get(i).getCourseName();
                         courseArray[4][i] = "时间：" + course.getFridayCourse().get(i).getCourseWeek().toString() + "\n"
                                 + "地点：" + course.getFridayCourse().get(i).getCoursePlace() + "\n"
                                 + "教师：" + course.getFridayCourse().get(i).getCourseTeacher() + "\n";
@@ -289,6 +301,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             for (i = 0; i < 10; i++) {
                 if (course.getSaturdayCourse() != null) {
                     if (course.getSaturdayCourse().get(i) != null) {
+                        courseNameArray[5][i] = course.getSaturdayCourse().get(i).getCourseName();
                         courseArray[5][i] = "时间：" + course.getSaturdayCourse().get(i).getCourseWeek().toString() + "\n"
                                 + "地点：" + course.getSaturdayCourse().get(i).getCoursePlace() + "\n"
                                 + "教师：" + course.getSaturdayCourse().get(i).getCourseTeacher() + "\n";
@@ -300,6 +313,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             for (i = 0; i < 10; i++) {
                 if (course.getSundayCourse() != null) {
                     if (course.getSundayCourse().get(i) != null) {
+                        courseNameArray[6][i] = course.getSundayCourse().get(i).getCourseName();
                         courseArray[6][i] = "时间：" + course.getSundayCourse().get(i).getCourseWeek().toString() + "\n"
                                 + "地点：" + course.getSundayCourse().get(i).getCoursePlace() + "\n"
                                 + "教师：" + course.getSundayCourse().get(i).getCourseTeacher() + "\n";
@@ -310,81 +324,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(),"异常位置：void getCourseArray()\n异常类型：Exception",Toast.LENGTH_LONG).show();
-        }
-    }
-
-    /*获取课程名称，置入courseNameArray*/
-    private void getCourseNameArray() {
-        int i;
-        Gson gson = new Gson();
-        Course course = gson.fromJson(JsonString, Course.class);
-        try {
-            for (i = 0; i < 10; i++) {
-                if (course.getMondayCourse() != null) {
-                    if (course.getMondayCourse().get(i) != null) {
-                        courseNameArray[0][i] = course.getMondayCourse().get(i).getCourseName();
-                    }
-                } else {
-                    courseNameArray[0][i] = "";
-                }
-            }
-            for (i = 0; i < 10; i++) {
-                if (course.getTuesdayCourse() != null) {
-                    if (course.getTuesdayCourse().get(i) != null) {
-                        courseNameArray[1][i] = course.getTuesdayCourse().get(i).getCourseName();
-                    }
-                } else {
-                    courseNameArray[1][i] = "";
-                }
-
-            }
-            for (i = 0; i < 10; i++) {
-                if (course.getWednesdayCourse() != null) {
-                    if (course.getWednesdayCourse().get(i) != null) {
-                        courseNameArray[2][i] = course.getWednesdayCourse().get(i).getCourseName();
-                    }
-                } else {
-                    courseNameArray[2][i] = "";
-                }
-            }
-            for (i = 0; i < 10; i++) {
-                if (course.getTuesdayCourse() != null) {
-                    if (course.getThursdayCourse().get(i) != null) {
-                        courseNameArray[3][i] = course.getThursdayCourse().get(i).getCourseName();
-                    }
-                } else {
-                    courseNameArray[3][i] = "";
-                }
-            }
-            for (i = 0; i < 10; i++) {
-                if (course.getFridayCourse() != null) {
-                    if (course.getFridayCourse().get(i) != null) {
-                        courseNameArray[4][i] = course.getFridayCourse().get(i).getCourseName();
-                    }
-                } else {
-                    courseNameArray[4][i] = "";
-                }
-            }
-            for (i = 0; i < 10; i++) {
-                if (course.getSaturdayCourse() != null) {
-                    if (course.getSaturdayCourse().get(i) != null) {
-                        courseNameArray[5][i] = course.getSaturdayCourse().get(i).getCourseName();
-                    }
-                } else {
-                    courseNameArray[5][i] = "";
-                }
-            }
-            for (i = 0; i < 10; i++) {
-                if (course.getSundayCourse() != null) {
-                    if (course.getSundayCourse().get(i) != null) {
-                        courseNameArray[6][i] = course.getSundayCourse().get(i).getCourseName();
-                    }
-                } else {
-                    courseNameArray[6][i] = "";
-                }
-            }
-        } catch (Exception e) {
-            Toast.makeText(getApplicationContext(),"异常位置：void getCourseNameArray()/n异常类型：Exception",Toast.LENGTH_LONG).show();
         }
     }
 
@@ -485,6 +424,220 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }catch (Exception e){
             Toast.makeText(getApplicationContext(),"异常位置：void setJson(...)\n异常类型：引用null",Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void addJson(){
+//        Gson gson=new Gson();
+//        JsonString.replaceAll("null",gson.toJson(new Course.DayCourse("","","",""))) ;
+        int i;
+        Gson gson = new Gson();
+        Course course = gson.fromJson(JsonString, Course.class);
+        try {
+            for (i = 0; i < 10; i++) {
+                if (course.getMondayCourse() != null) {
+                    if (course.getMondayCourse().get(i) == null) {
+                        course.getMondayCourse().set(i,new Course.DayCourse("","","",""));
+                    }
+                } else {
+                    course.setMondayCourse(new List<Course.DayCourse>() {
+                        @Override
+                        public int size() {
+                            return 0;
+                        }
+
+                        @Override
+                        public boolean isEmpty() {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean contains(Object o) {
+                            return false;
+                        }
+
+                        @NonNull
+                        @Override
+                        public Iterator<Course.DayCourse> iterator() {
+                            return null;
+                        }
+
+                        @NonNull
+                        @Override
+                        public Object[] toArray() {
+                            return new Object[0];
+                        }
+
+                        @NonNull
+                        @Override
+                        public <T> T[] toArray(@NonNull T[] ts) {
+                            return null;
+                        }
+
+                        @Override
+                        public boolean add(Course.DayCourse dayCourse) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean remove(Object o) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean containsAll(@NonNull Collection<?> collection) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean addAll(@NonNull Collection<? extends Course.DayCourse> collection) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean addAll(int i, @NonNull Collection<? extends Course.DayCourse> collection) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean removeAll(@NonNull Collection<?> collection) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean retainAll(@NonNull Collection<?> collection) {
+                            return false;
+                        }
+
+                        @Override
+                        public void clear() {
+
+                        }
+
+                        @Override
+                        public Course.DayCourse get(int i) {
+                            return null;
+                        }
+
+                        @Override
+                        public Course.DayCourse set(int i, Course.DayCourse dayCourse) {
+                            return null;
+                        }
+
+                        @Override
+                        public void add(int i, Course.DayCourse dayCourse) {
+
+                        }
+
+                        @Override
+                        public Course.DayCourse remove(int i) {
+                            return null;
+                        }
+
+                        @Override
+                        public int indexOf(Object o) {
+                            return 0;
+                        }
+
+                        @Override
+                        public int lastIndexOf(Object o) {
+                            return 0;
+                        }
+
+                        @Override
+                        public ListIterator<Course.DayCourse> listIterator() {
+                            return null;
+                        }
+
+                        @NonNull
+                        @Override
+                        public ListIterator<Course.DayCourse> listIterator(int i) {
+                            return null;
+                        }
+
+                        @NonNull
+                        @Override
+                        public List<Course.DayCourse> subList(int i, int i1) {
+                            return null;
+                        }
+                    });
+                }
+            }
+            for (i = 0; i < 10; i++) {
+                if (course.getTuesdayCourse() != null) {
+                    if (course.getTuesdayCourse().get(i) != null) {
+                        courseNameArray[1][i] = course.getTuesdayCourse().get(i).getCourseName();
+                        courseArray[1][i] = "时间：" + course.getTuesdayCourse().get(i).getCourseWeek().toString() + "\n"
+                                + "地点：" + course.getTuesdayCourse().get(i).getCoursePlace() + "\n"
+                                + "教师：" + course.getTuesdayCourse().get(i).getCourseTeacher() + "\n";
+                    }
+                } else {
+                    courseArray[1][i] = "";
+                }
+
+            }
+            for (i = 0; i < 10; i++) {
+                if (course.getWednesdayCourse() != null) {
+                    if (course.getWednesdayCourse().get(i) != null) {
+                        courseNameArray[2][i] = course.getWednesdayCourse().get(i).getCourseName();
+                        courseArray[2][i] = "时间：" + course.getWednesdayCourse().get(i).getCourseWeek().toString() + "\n"
+                                + "地点：" + course.getWednesdayCourse().get(i).getCoursePlace() + "\n"
+                                + "教师：" + course.getWednesdayCourse().get(i).getCourseTeacher() + "\n";
+                    }
+                } else {
+                    courseArray[2][i] = "";
+                }
+            }
+            for (i = 0; i < 10; i++) {
+                if (course.getTuesdayCourse() != null) {
+                    if (course.getThursdayCourse().get(i) != null) {
+                        courseNameArray[3][i] = course.getThursdayCourse().get(i).getCourseName();
+                        courseArray[3][i] = "时间：" + course.getThursdayCourse().get(i).getCourseWeek().toString() + "\n"
+                                + "地点：" + course.getThursdayCourse().get(i).getCoursePlace() + "\n"
+                                + "教师：" + course.getThursdayCourse().get(i).getCourseTeacher() + "\n";
+                    }
+                } else {
+                    courseArray[3][i] = "";
+                }
+            }
+            for (i = 0; i < 10; i++) {
+                if (course.getFridayCourse() != null) {
+                    if (course.getFridayCourse().get(i) != null) {
+                        courseNameArray[4][i] = course.getFridayCourse().get(i).getCourseName();
+                        courseArray[4][i] = "时间：" + course.getFridayCourse().get(i).getCourseWeek().toString() + "\n"
+                                + "地点：" + course.getFridayCourse().get(i).getCoursePlace() + "\n"
+                                + "教师：" + course.getFridayCourse().get(i).getCourseTeacher() + "\n";
+                    }
+                } else {
+                    courseArray[4][i] = "";
+                }
+            }
+            for (i = 0; i < 10; i++) {
+                if (course.getSaturdayCourse() != null) {
+                    if (course.getSaturdayCourse().get(i) != null) {
+                        courseNameArray[5][i] = course.getSaturdayCourse().get(i).getCourseName();
+                        courseArray[5][i] = "时间：" + course.getSaturdayCourse().get(i).getCourseWeek().toString() + "\n"
+                                + "地点：" + course.getSaturdayCourse().get(i).getCoursePlace() + "\n"
+                                + "教师：" + course.getSaturdayCourse().get(i).getCourseTeacher() + "\n";
+                    }
+                } else {
+                    courseArray[5][i] = "";
+                }
+            }
+            for (i = 0; i < 10; i++) {
+                if (course.getSundayCourse() != null) {
+                    if (course.getSundayCourse().get(i) != null) {
+                        courseNameArray[6][i] = course.getSundayCourse().get(i).getCourseName();
+                        courseArray[6][i] = "时间：" + course.getSundayCourse().get(i).getCourseWeek().toString() + "\n"
+                                + "地点：" + course.getSundayCourse().get(i).getCoursePlace() + "\n"
+                                + "教师：" + course.getSundayCourse().get(i).getCourseTeacher() + "\n";
+                    }
+                } else {
+                    courseArray[6][i] = "";
+                }
+            }
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(),"异常位置：void getCourseArray()\n异常类型：Exception",Toast.LENGTH_LONG).show();
         }
     }
 }
