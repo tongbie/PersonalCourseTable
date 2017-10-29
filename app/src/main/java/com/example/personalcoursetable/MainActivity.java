@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String[][] courseNameArray = new String[7][10];//课程名称
     private int Permission_WRITE_EXTERNAL_STORAGE = 0x001;//读写权限
     private File file;//手机存储文件
-    private boolean havePermission = false;
+    private boolean havePermission = false;//判断权限
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             JsonString = getLocalJson("coursetable_json.txt");//读取本地JSON
             saveData();//将JSON数据写入手机存储
         }/*<- 文件读写*/
-        addJson();
+        addJson();//将JSON中的null填充
         getCourseArray();//获取课表数据
         addButton();//添加Button
     }
@@ -423,6 +423,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    /*将JSON中的null填充*/
     private void addJson() {
         int i;
         Gson gson = new Gson();
