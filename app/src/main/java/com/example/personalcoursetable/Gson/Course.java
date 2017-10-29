@@ -8,9 +8,9 @@ import java.util.List;
  */
 
 public class Course {
-    private String studentNum;
-    private String studentName;
-    private String termStartTime;
+    private String studentNum="";
+    private String studentName="";
+    private String termStartTime="";
 
     private List<DayCourse> mondayCourse;
     private List<DayCourse> tuesdayCourse;
@@ -21,10 +21,10 @@ public class Course {
     private List<DayCourse> sundayCourse;
 
     public static class DayCourse {
-        private String courseName;
-        private String courseWeek;
-        private String coursePlace;
-        private String courseTeacher;
+        private String courseName="";
+        private String courseWeek="";
+        private String coursePlace="";
+        private String courseTeacher="";
 
         public DayCourse(String courseName,String courseWeek,String coursePlace,String courseTeacher){//构造方法？
             super();
