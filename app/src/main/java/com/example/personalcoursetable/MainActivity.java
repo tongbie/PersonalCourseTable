@@ -1,7 +1,6 @@
 package com.example.personalcoursetable;
 
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,12 +9,16 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
-import android.widget.TextView;
+import android.widget.PopupWindow;
+import android.widget.ScrollView;
+import android.widget.TableRow;
 import android.widget.Toast;
 
 import com.example.personalcoursetable.Gson.Course;
@@ -31,10 +34,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static com.example.personalcoursetable.R.dimen.popupWindowWidth;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener {
     private Button button[][] = new Button[7][10];//Button数组
-    private TextView textView[] = new TextView[2];//分割线TextView
     private LinearLayout.LayoutParams layoutParams;//布局参数
     private int buttonTopSpace;//相邻Button间隔
     private LinearLayout day0;//周一LinearLayout
@@ -45,12 +48,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private LinearLayout day5;
     private LinearLayout day6;//周日LinearLayout
     private int buttonHeight;//按钮高度
+    private int popupWindowWidth;//弹窗高度
     private String JsonString;//课表Json字符串
     private String[][] courseArray = new String[7][10];//课表数据
     private String[][] courseNameArray = new String[7][10];//课程名称
     private int Permission_WRITE_EXTERNAL_STORAGE = 0x001;//读写权限
     private File file;//手机存储文件
     private boolean havePermission = false;//判断权限
+    EditText editTextCourseName;
+    EditText editTextCourseWeek;
+    EditText editTextCoursePlace;
+    EditText editTextCourseTeacher;
+    String stringCourseName = "";
+    String stringCourseWeek = "";
+    String stringCoursePlace = "";
+    String stringCourseTeacher = "";
+    Button popupButton;
+    private ScrollView scrollView;
+    LinearLayout popLinearLayout;
+    PopupWindow popupWindow;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         day6 = (LinearLayout) findViewById(R.id.day6);
         buttonHeight = getResources().getDimensionPixelSize(R.dimen.buttonHeight);//指定Button高度（res/values/dimens/...）
         buttonTopSpace = (int) getResources().getDimension(R.dimen.buttonTopSpace);//相邻Button间隔
+        popupWindowWidth= (int) getResources().getDimension(R.dimen.popupWindowWidth);
         /*权限 ->*/
         if (ContextCompat.checkSelfPermission(MainActivity.this, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{WRITE_EXTERNAL_STORAGE}, Permission_WRITE_EXTERNAL_STORAGE);
@@ -87,6 +105,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         addJson();//将JSON中的null填充
         getCourseArray();//获取课表数据
         addButton();//添加Button
+        initPopupWindow();//添加PopupWindow控件
+    }
+
+    private void initPopupWindow(){
+        /*PopWindow ->*/
+        editTextCourseName = new EditText(this);//CourseName输入框
+        editTextCourseName.setWidth(popupWindowWidth);
+        editTextCourseWeek = new EditText(this);//CourseWeek输入框
+        editTextCoursePlace = new EditText(this);//CoursePlace输入框
+        editTextCourseTeacher = new EditText(this);//CourseTeacher输入框
+        popupButton=new Button(this);//弹窗按钮
+        popupButton.setWidth(popupWindowWidth);
+        /*<- PopWindow*/
+        scrollView=(ScrollView)findViewById(R.id.scrollView);//用以确定popupWindow位置
+        /*弹窗LinearLayout布局 ->*/
+        popLinearLayout=new LinearLayout(this);
+        popLinearLayout.addView(editTextCourseName);
+        popLinearLayout.addView(popupButton);
+        popLinearLayout.setOrientation(1);//设置LinearLayout纵向
+        popLinearLayout.setBackground(getResources().getDrawable(R.drawable.button0_background));//设置背景色
+        /*<- 弹窗LinearLayout布局*/
+        popupWindow=new PopupWindow(this);
+        popupWindow.setContentView(popLinearLayout);
+        popupWindow.setFocusable(true); // 设置PopupWindow可获得焦点
+        popupWindow.setTouchable(true); // 设置PopupWindow可触摸
     }
 
     @Override/*按钮点击事件*/
@@ -144,7 +187,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 /*Button*/
                 button[i][j] = new Button(this);
                 button[i][j].setLayoutParams(layoutParams);//设置Button大小
-                button[i][j].setId(i * 2 + j * 3);//随意的id
                 button[i][j].setTag(new ButtonPosition(i, j));//设置坐标
                 button[i][j].setTextColor(Color.parseColor("#ffffff"));//设置文字颜色
                 button[i][j].setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11);//设置文字大小
@@ -155,25 +197,67 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 button[i][j].setOnClickListener(this);//Button点击事件
                 button[i][j].setOnLongClickListener(this);
                 if (i == 0) {//向布局中添加Button并设置Button背景
-                    button[0][j].setBackground(getResources().getDrawable(R.drawable.button0_background));
+                    if (j < 4) {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button0_background));
+                    } else if (j >= 4 && j < 8) {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button1_background));
+                    } else {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button2_background));
+                    }
                     day0.addView(button[i][j]);
                 } else if (i == 1) {
-                    button[i][j].setBackground(getResources().getDrawable(R.drawable.button1_background));
+                    if (j < 4) {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button1_background));
+                    } else if (j >= 4 && j < 8) {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button2_background));
+                    } else {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button3_background));
+                    }
                     day1.addView(button[i][j]);
                 } else if (i == 2) {
-                    button[i][j].setBackground(getResources().getDrawable(R.drawable.button2_background));
+                    if (j < 4) {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button2_background));
+                    } else if (j >= 4 && j < 8) {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button3_background));
+                    } else {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button4_background));
+                    }
                     day2.addView(button[i][j]);
                 } else if (i == 3) {
-                    button[i][j].setBackground(getResources().getDrawable(R.drawable.button3_background));
+                    if (j < 4) {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button3_background));
+                    } else if (j >= 4 && j < 8) {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button4_background));
+                    } else {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button5_background));
+                    }
                     day3.addView(button[i][j]);
                 } else if (i == 4) {
-                    button[i][j].setBackground(getResources().getDrawable(R.drawable.button4_background));
+                    if (j < 4) {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button4_background));
+                    } else if (j >= 4 && j < 8) {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button5_background));
+                    } else {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button6_background));
+                    }
                     day4.addView(button[i][j]);
                 } else if (i == 5) {
-                    button[i][j].setBackground(getResources().getDrawable(R.drawable.button5_background));
+                    if (j < 4) {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button5_background));
+                    } else if (j >= 4 && j < 8) {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button6_background));
+                    } else {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button0_background));
+                    }
                     day5.addView(button[i][j]);
                 } else if (i == 6) {
-                    button[i][j].setBackground(getResources().getDrawable(R.drawable.button6_background));
+                    if (j < 4) {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button6_background));
+                    } else if (j >= 4 && j < 8) {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button0_background));
+                    } else {
+                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button1_background));
+                    }
                     day6.addView(button[i][j]);
                 }
                 if (button[i][j].getText().equals("")) {//隐藏无内容Button
@@ -353,8 +437,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /*修改JSON文件*/
     private void reviseJson(int X, int Y) {
-        Intent intent = new Intent(MainActivity.this, CourseChange.class);
-        startActivity(intent);
+        Gson gson = new Gson();
+        Course course = gson.fromJson(JsonString, Course.class);
+
+
+
+        popupButton.setOnClickListener(new View.OnClickListener() {//点击事件
+            @Override
+            public void onClick(View view) {
+                stringCourseName=editTextCourseName.getText().toString();
+                Toast.makeText(getApplicationContext(),stringCourseName,Toast.LENGTH_LONG).show();
+            }
+        });
+        popupWindow.setTouchable(true);
+        popupWindow.setWidth(popupWindowWidth);
+        popupWindow.setHeight(popupWindowWidth);
+        popupWindow.showAtLocation(scrollView, Gravity.CENTER,0,0);
+
+
     }
 
     /*删除JSON文件*/
