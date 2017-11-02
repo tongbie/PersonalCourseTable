@@ -50,8 +50,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int buttonHeight;//按钮高度
     private int popupWindowWidth;//弹窗高度
     private String JsonString;//课表Json字符串
-    private String[][] courseArray = new String[7][10];//课表数据
     private String[][] courseNameArray = new String[7][10];//课程名称
+    private String[][] courseWeekArray = new String[7][10];//课程名称
+    private String[][] coursePlaceArray = new String[7][10];//课程名称
+    private String[][] courseTeacherArray = new String[7][10];//课程名称
     private int Permission_WRITE_EXTERNAL_STORAGE = 0x001;//读写权限
     private File file;//手机存储文件
     private boolean havePermission = false;//判断权限
@@ -59,10 +61,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     EditText editTextCourseWeek;
     EditText editTextCoursePlace;
     EditText editTextCourseTeacher;
-    String stringCourseName = "";
-    String stringCourseWeek = "";
-    String stringCoursePlace = "";
-    String stringCourseTeacher = "";
     Button popupButton;
     private ScrollView scrollView;
     LinearLayout popLinearLayout;
@@ -80,9 +78,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         day4 = (LinearLayout) findViewById(R.id.day4);
         day5 = (LinearLayout) findViewById(R.id.day5);
         day6 = (LinearLayout) findViewById(R.id.day6);
-        buttonHeight = getResources().getDimensionPixelSize(R.dimen.buttonHeight);//指定Button高度（res/values/dimens/...）
+        buttonHeight = (int) getResources().getDimension(R.dimen.buttonHeight);//指定Button高度（res/values/dimens/...）
         buttonTopSpace = (int) getResources().getDimension(R.dimen.buttonTopSpace);//相邻Button间隔
-        popupWindowWidth= (int) getResources().getDimension(R.dimen.popupWindowWidth);
+        popupWindowWidth = (int) getResources().getDimension(R.dimen.popupWindowWidth);
         /*权限 ->*/
         if (ContextCompat.checkSelfPermission(MainActivity.this, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{WRITE_EXTERNAL_STORAGE}, Permission_WRITE_EXTERNAL_STORAGE);
@@ -108,28 +106,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initPopupWindow();//添加PopupWindow控件
     }
 
-    private void initPopupWindow(){
+    private void initPopupWindow() {
         /*PopWindow ->*/
         editTextCourseName = new EditText(this);//CourseName输入框
         editTextCourseName.setWidth(popupWindowWidth);
         editTextCourseWeek = new EditText(this);//CourseWeek输入框
+        editTextCourseWeek.setWidth(popupWindowWidth);
         editTextCoursePlace = new EditText(this);//CoursePlace输入框
+        editTextCoursePlace.setWidth(popupWindowWidth);
         editTextCourseTeacher = new EditText(this);//CourseTeacher输入框
-        popupButton=new Button(this);//弹窗按钮
+        editTextCourseTeacher.setWidth(popupWindowWidth);
+        popupButton = new Button(this);//弹窗按钮
+        popupButton.setBackground(getDrawable(R.drawable.button1_background));
         popupButton.setWidth(popupWindowWidth);
         /*<- PopWindow*/
-        scrollView=(ScrollView)findViewById(R.id.scrollView);//用以确定popupWindow位置
+        scrollView = (ScrollView) findViewById(R.id.scrollView);//用以确定popupWindow位置
         /*弹窗LinearLayout布局 ->*/
-        popLinearLayout=new LinearLayout(this);
+        popLinearLayout = new LinearLayout(this);
         popLinearLayout.addView(editTextCourseName);
+        popLinearLayout.addView(editTextCourseWeek);
+        popLinearLayout.addView(editTextCoursePlace);
+        popLinearLayout.addView(editTextCourseTeacher);
         popLinearLayout.addView(popupButton);
         popLinearLayout.setOrientation(1);//设置LinearLayout纵向
         popLinearLayout.setBackground(getResources().getDrawable(R.drawable.button0_background));//设置背景色
         /*<- 弹窗LinearLayout布局*/
-        popupWindow=new PopupWindow(this);
+        popupWindow = new PopupWindow(this);
         popupWindow.setContentView(popLinearLayout);
         popupWindow.setFocusable(true); // 设置PopupWindow可获得焦点
         popupWindow.setTouchable(true); // 设置PopupWindow可触摸
+        popupWindow.setWidth(popupWindowWidth);
+        popupWindow.setHeight(popupWindowWidth);
+
     }
 
     @Override/*按钮点击事件*/
@@ -140,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (!button[X][Y].getText().equals("")) {
             AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
             dialog.setTitle(courseNameArray[X][Y]);
-            dialog.setMessage(courseArray[X][Y]);
+            dialog.setMessage("课程时间："+courseWeekArray[X][Y] + "\n上课地点：" + coursePlaceArray[X][Y] + "\n任课教师：" + courseTeacherArray[X][Y]);
             dialog.setCancelable(true);
             dialog.show();
         }
@@ -198,65 +206,65 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 button[i][j].setOnLongClickListener(this);
                 if (i == 0) {//向布局中添加Button并设置Button背景
                     if (j < 4) {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button0_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button0_background));
                     } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button1_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button1_background));
                     } else {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button2_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button2_background));
                     }
                     day0.addView(button[i][j]);
                 } else if (i == 1) {
                     if (j < 4) {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button1_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button1_background));
                     } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button2_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button2_background));
                     } else {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button3_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button3_background));
                     }
                     day1.addView(button[i][j]);
                 } else if (i == 2) {
                     if (j < 4) {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button2_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button2_background));
                     } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button3_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button3_background));
                     } else {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button4_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button4_background));
                     }
                     day2.addView(button[i][j]);
                 } else if (i == 3) {
                     if (j < 4) {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button3_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button3_background));
                     } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button4_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button4_background));
                     } else {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button5_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button5_background));
                     }
                     day3.addView(button[i][j]);
                 } else if (i == 4) {
                     if (j < 4) {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button4_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button4_background));
                     } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button5_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button5_background));
                     } else {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button6_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button6_background));
                     }
                     day4.addView(button[i][j]);
                 } else if (i == 5) {
                     if (j < 4) {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button5_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button5_background));
                     } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button6_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button6_background));
                     } else {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button0_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button0_background));
                     }
                     day5.addView(button[i][j]);
                 } else if (i == 6) {
                     if (j < 4) {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button6_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button6_background));
                     } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button0_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button0_background));
                     } else {
-                        button[i][j].setBackground(getResources().getDrawable(R.drawable.button1_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button1_background));
                     }
                     day6.addView(button[i][j]);
                 }
@@ -319,87 +327,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             for (i = 0; i < 10; i++) {
                 if (course.getMondayCourse() != null) {
-                    if (course.getMondayCourse().get(i) != null) {
-                        courseNameArray[0][i] = course.getMondayCourse().get(i).getCourseName();
-                        courseArray[0][i] = "时间：" + course.getMondayCourse().get(i).getCourseWeek().toString() + "\n"
-                                + "地点：" + course.getMondayCourse().get(i).getCoursePlace() + "\n"
-                                + "教师：" + course.getMondayCourse().get(i).getCourseTeacher() + "\n";
-                    }
-                } else {
-                    courseArray[0][i] = "";
+                    courseNameArray[0][i] = course.getMondayCourse().get(i).getCourseName();
+                    courseWeekArray[0][i] = course.getMondayCourse().get(i).getCourseWeek();
+                    coursePlaceArray[0][i] = course.getMondayCourse().get(i).getCoursePlace();
+                    courseTeacherArray[0][i] = course.getMondayCourse().get(i).getCourseTeacher();
                 }
-            }
-            for (i = 0; i < 10; i++) {
                 if (course.getTuesdayCourse() != null) {
-                    if (course.getTuesdayCourse().get(i) != null) {
-                        courseNameArray[1][i] = course.getTuesdayCourse().get(i).getCourseName();
-                        courseArray[1][i] = "时间：" + course.getTuesdayCourse().get(i).getCourseWeek().toString() + "\n"
-                                + "地点：" + course.getTuesdayCourse().get(i).getCoursePlace() + "\n"
-                                + "教师：" + course.getTuesdayCourse().get(i).getCourseTeacher() + "\n";
-                    }
-                } else {
-                    courseArray[1][i] = "";
+                    courseNameArray[1][i] = course.getTuesdayCourse().get(i).getCourseName();
+                    courseWeekArray[1][i] = course.getTuesdayCourse().get(i).getCourseWeek();
+                    coursePlaceArray[1][i] = course.getTuesdayCourse().get(i).getCoursePlace();
+                    courseTeacherArray[1][i] = course.getTuesdayCourse().get(i).getCourseTeacher();
                 }
-
-            }
-            for (i = 0; i < 10; i++) {
                 if (course.getWednesdayCourse() != null) {
-                    if (course.getWednesdayCourse().get(i) != null) {
-                        courseNameArray[2][i] = course.getWednesdayCourse().get(i).getCourseName();
-                        courseArray[2][i] = "时间：" + course.getWednesdayCourse().get(i).getCourseWeek().toString() + "\n"
-                                + "地点：" + course.getWednesdayCourse().get(i).getCoursePlace() + "\n"
-                                + "教师：" + course.getWednesdayCourse().get(i).getCourseTeacher() + "\n";
-                    }
-                } else {
-                    courseArray[2][i] = "";
+                    courseNameArray[2][i] = course.getWednesdayCourse().get(i).getCourseName();
+                    courseWeekArray[2][i] = course.getWednesdayCourse().get(i).getCourseWeek();
+                    coursePlaceArray[2][i] = course.getWednesdayCourse().get(i).getCoursePlace();
+                    courseTeacherArray[2][i] = course.getWednesdayCourse().get(i).getCourseTeacher();
                 }
-            }
-            for (i = 0; i < 10; i++) {
                 if (course.getTuesdayCourse() != null) {
-                    if (course.getThursdayCourse().get(i) != null) {
-                        courseNameArray[3][i] = course.getThursdayCourse().get(i).getCourseName();
-                        courseArray[3][i] = "时间：" + course.getThursdayCourse().get(i).getCourseWeek().toString() + "\n"
-                                + "地点：" + course.getThursdayCourse().get(i).getCoursePlace() + "\n"
-                                + "教师：" + course.getThursdayCourse().get(i).getCourseTeacher() + "\n";
-                    }
-                } else {
-                    courseArray[3][i] = "";
+                    courseNameArray[3][i] = course.getThursdayCourse().get(i).getCourseName();
+                    courseWeekArray[3][i] = course.getThursdayCourse().get(i).getCourseWeek();
+                    coursePlaceArray[3][i] = course.getThursdayCourse().get(i).getCoursePlace();
+                    courseTeacherArray[3][i] = course.getThursdayCourse().get(i).getCourseTeacher();
                 }
-            }
-            for (i = 0; i < 10; i++) {
                 if (course.getFridayCourse() != null) {
-                    if (course.getFridayCourse().get(i) != null) {
-                        courseNameArray[4][i] = course.getFridayCourse().get(i).getCourseName();
-                        courseArray[4][i] = "时间：" + course.getFridayCourse().get(i).getCourseWeek().toString() + "\n"
-                                + "地点：" + course.getFridayCourse().get(i).getCoursePlace() + "\n"
-                                + "教师：" + course.getFridayCourse().get(i).getCourseTeacher() + "\n";
-                    }
-                } else {
-                    courseArray[4][i] = "";
+                    courseNameArray[4][i] = course.getFridayCourse().get(i).getCourseName();
+                    courseWeekArray[4][i] = course.getFridayCourse().get(i).getCourseWeek();
+                    coursePlaceArray[4][i] = course.getFridayCourse().get(i).getCoursePlace();
+                    courseTeacherArray[4][i] = course.getFridayCourse().get(i).getCourseTeacher();
                 }
-            }
-            for (i = 0; i < 10; i++) {
                 if (course.getSaturdayCourse() != null) {
-                    if (course.getSaturdayCourse().get(i) != null) {
-                        courseNameArray[5][i] = course.getSaturdayCourse().get(i).getCourseName();
-                        courseArray[5][i] = "时间：" + course.getSaturdayCourse().get(i).getCourseWeek().toString() + "\n"
-                                + "地点：" + course.getSaturdayCourse().get(i).getCoursePlace() + "\n"
-                                + "教师：" + course.getSaturdayCourse().get(i).getCourseTeacher() + "\n";
-                    }
-                } else {
-                    courseArray[5][i] = "";
+                    courseNameArray[5][i] = course.getSaturdayCourse().get(i).getCourseName();
+                    courseWeekArray[5][i] = course.getSaturdayCourse().get(i).getCourseWeek();
+                    coursePlaceArray[5][i] = course.getSaturdayCourse().get(i).getCoursePlace();
+                    courseTeacherArray[5][i] = course.getSaturdayCourse().get(i).getCourseTeacher();
                 }
-            }
-            for (i = 0; i < 10; i++) {
                 if (course.getSundayCourse() != null) {
-                    if (course.getSundayCourse().get(i) != null) {
-                        courseNameArray[6][i] = course.getSundayCourse().get(i).getCourseName();
-                        courseArray[6][i] = "时间：" + course.getSundayCourse().get(i).getCourseWeek().toString() + "\n"
-                                + "地点：" + course.getSundayCourse().get(i).getCoursePlace() + "\n"
-                                + "教师：" + course.getSundayCourse().get(i).getCourseTeacher() + "\n";
-                    }
-                } else {
-                    courseArray[6][i] = "";
+                    courseNameArray[6][i] = course.getSundayCourse().get(i).getCourseName();
+                    courseWeekArray[6][i] = course.getSundayCourse().get(i).getCourseWeek();
+                    coursePlaceArray[6][i] = course.getSundayCourse().get(i).getCoursePlace();
+                    courseTeacherArray[6][i] = course.getSundayCourse().get(i).getCourseTeacher();
                 }
             }
         } catch (Exception e) {
@@ -436,31 +403,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /*修改JSON文件*/
-    private void reviseJson(int X, int Y) {
-        Gson gson = new Gson();
-        Course course = gson.fromJson(JsonString, Course.class);
-
-
-
-        popupButton.setOnClickListener(new View.OnClickListener() {//点击事件
+    private void reviseJson(final int X, final int Y) {
+        final Gson gson = new Gson();
+        final Course course = gson.fromJson(JsonString, Course.class);
+        editTextCourseName.setText(courseNameArray[X][Y]);//显示课程名称
+        editTextCourseWeek.setText(courseWeekArray[X][Y]);//显示课程时间
+        editTextCoursePlace.setText(coursePlaceArray[X][Y]);//显示课程地点
+        editTextCourseTeacher.setText(courseTeacherArray[X][Y]);//显示任课教师
+        /*点击事件*/
+        popupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                stringCourseName=editTextCourseName.getText().toString();
-                Toast.makeText(getApplicationContext(),stringCourseName,Toast.LENGTH_LONG).show();
+                setJson(course, X, Y, editTextCourseName.getText().toString(), editTextCourseWeek.getText().toString(), editTextCoursePlace.getText().toString(), editTextCourseTeacher.getText().toString());
+                JsonString = gson.toJson(course);
+                saveData();
+                courseNameArray[X][Y] = editTextCourseName.getText().toString();
+                courseWeekArray[X][Y] = editTextCourseWeek.getText().toString();
+                coursePlaceArray[X][Y] = editTextCoursePlace.getText().toString();
+                courseTeacherArray[X][Y] = editTextCourseTeacher.getText().toString();
+                button[X][Y].setText(editTextCourseName.getText().toString());
+                button[X][Y].setBackground(getDrawable(R.drawable.new_button_background));
+                popupWindow.dismiss();
             }
         });
-        popupWindow.setTouchable(true);
-        popupWindow.setWidth(popupWindowWidth);
-        popupWindow.setHeight(popupWindowWidth);
-        popupWindow.showAtLocation(scrollView, Gravity.CENTER,0,0);
-
-
+        popupWindow.showAtLocation(scrollView, Gravity.CENTER, 0, 0);
     }
+
 
     /*删除JSON文件*/
     private void deleteJson(int X, int Y) {
-        courseArray[X][Y] = "";
         courseNameArray[X][Y] = "";
+        courseWeekArray[X][Y] = "";
+        coursePlaceArray[X][Y] = "";
+        courseTeacherArray[X][Y] = "";
         button[X][Y].setBackgroundColor(Color.parseColor("#00000000"));
         button[X][Y].setText("");
         Gson gson = new Gson();
@@ -471,7 +446,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /*修改和删除JSON文件的中间方法*/
-    private void setJson(Course course, int X, int Y, String courseName, String coursePlace, String courseTeacher, String courseWeek) {
+    private void setJson(Course course, int X, int Y, String courseName, String courseWeek, String coursePlace, String courseTeacher) {
         try {
             switch (X) {
                 case 0:

@@ -4,4 +4,5 @@
     <dimen name="buttonSpace">12dp</dimen>
     <dimen name="buttonTopSpace">2dp</dimen>
     <dimen name="popupWindowWidth">256dp</dimen>
+    <dimen name="popWindowHeight">60dp</dimen>
 </resources>
