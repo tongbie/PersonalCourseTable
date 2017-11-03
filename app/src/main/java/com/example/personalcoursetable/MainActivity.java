@@ -18,7 +18,6 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.ScrollView;
-import android.widget.TableRow;
 import android.widget.Toast;
 
 import com.example.personalcoursetable.Gson.Course;
@@ -34,37 +33,37 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-import static com.example.personalcoursetable.R.dimen.popupWindowWidth;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener {
     private Button button[][] = new Button[7][10];//Button数组
     private LinearLayout.LayoutParams layoutParams;//布局参数
-    private int buttonTopSpace;//相邻Button间隔
+    private int _2dp;//相邻Button间隔
     private LinearLayout day0;//周一LinearLayout
-    private LinearLayout day1;
-    private LinearLayout day2;
-    private LinearLayout day3;
-    private LinearLayout day4;
-    private LinearLayout day5;
-    private LinearLayout day6;//周日LinearLayout
-    private int buttonHeight;//按钮高度
-    private int popupWindowWidth;//弹窗高度
+    private LinearLayout day1;//周二
+    private LinearLayout day2;//周三
+    private LinearLayout day3;//周四
+    private LinearLayout day4;//周五
+    private LinearLayout day5;//周六
+    private LinearLayout day6;//周日
+    private int _58dp;//按钮高度
+    private int _256dp;//弹窗高度
+    private int _30dp;
     private String JsonString;//课表Json字符串
     private String[][] courseNameArray = new String[7][10];//课程名称
-    private String[][] courseWeekArray = new String[7][10];//课程名称
-    private String[][] coursePlaceArray = new String[7][10];//课程名称
-    private String[][] courseTeacherArray = new String[7][10];//课程名称
+    private String[][] courseWeekArray = new String[7][10];//课程时间
+    private String[][] coursePlaceArray = new String[7][10];//课程地点
+    private String[][] courseTeacherArray = new String[7][10];//课程教师
     private int Permission_WRITE_EXTERNAL_STORAGE = 0x001;//读写权限
     private File file;//手机存储文件
     private boolean havePermission = false;//判断权限
-    EditText editTextCourseName;
-    EditText editTextCourseWeek;
-    EditText editTextCoursePlace;
-    EditText editTextCourseTeacher;
-    Button popupButton;
-    private ScrollView scrollView;
-    LinearLayout popLinearLayout;
-    PopupWindow popupWindow;
+    EditText editTextCourseName;//课程名称修改框
+    EditText editTextCourseWeek;//课程时间修改框
+    EditText editTextCoursePlace;//课程地点修改框
+    EditText editTextCourseTeacher;//课程教师修改框
+    Button popupButton;//“修改”按钮
+    private ScrollView scrollView;//滚动布局，用以确定修改弹窗位置
+    LinearLayout popLinearLayout;//“修改”弹窗动态线性布局
+    PopupWindow popupWindow;//“修改”弹框
 
 
     @Override
@@ -78,9 +77,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         day4 = (LinearLayout) findViewById(R.id.day4);
         day5 = (LinearLayout) findViewById(R.id.day5);
         day6 = (LinearLayout) findViewById(R.id.day6);
-        buttonHeight = (int) getResources().getDimension(R.dimen.buttonHeight);//指定Button高度（res/values/dimens/...）
-        buttonTopSpace = (int) getResources().getDimension(R.dimen.buttonTopSpace);//相邻Button间隔
-        popupWindowWidth = (int) getResources().getDimension(R.dimen.popupWindowWidth);
+        _58dp = (int) getResources().getDimension(R.dimen._58dp);//指定Button高度（res/values/dimens/...）
+        _2dp = (int) getResources().getDimension(R.dimen._2dp);//相邻Button间隔
+        _256dp = (int) getResources().getDimension(R.dimen._256dp);
+        _30dp = (int) getResources().getDimension(R.dimen._30dp);
         /*权限 ->*/
         if (ContextCompat.checkSelfPermission(MainActivity.this, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{WRITE_EXTERNAL_STORAGE}, Permission_WRITE_EXTERNAL_STORAGE);
@@ -89,8 +89,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }/*<- 权限*/
         /*布局 ->*/
         layoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, buttonHeight);//布局参数
-        layoutParams.setMargins(buttonTopSpace, buttonTopSpace, 0, 0);//设置边距
+                LinearLayout.LayoutParams.MATCH_PARENT, _58dp);//布局参数
+        layoutParams.setMargins(_2dp, _2dp, 0, 0);//设置边距
         /*<- 布局*/
         /*文件读写 ->*/
         file = new File("/sdcard/CourseJsonData.txt");//文件位置
@@ -109,35 +109,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initPopupWindow() {
         /*PopWindow ->*/
         editTextCourseName = new EditText(this);//CourseName输入框
-        editTextCourseName.setWidth(popupWindowWidth);
+        editTextCourseName.setWidth(_256dp);
         editTextCourseWeek = new EditText(this);//CourseWeek输入框
-        editTextCourseWeek.setWidth(popupWindowWidth);
+        editTextCourseWeek.setWidth(_256dp);
         editTextCoursePlace = new EditText(this);//CoursePlace输入框
-        editTextCoursePlace.setWidth(popupWindowWidth);
+        editTextCoursePlace.setWidth(_256dp);
         editTextCourseTeacher = new EditText(this);//CourseTeacher输入框
-        editTextCourseTeacher.setWidth(popupWindowWidth);
+        editTextCourseTeacher.setWidth(_256dp);
         popupButton = new Button(this);//弹窗按钮
-        popupButton.setBackground(getDrawable(R.drawable.button1_background));
-        popupButton.setWidth(popupWindowWidth);
+        popupButton.setBackgroundColor(Color.parseColor("#676767"));
+        popupButton.setWidth(_256dp);
+        popupButton.setText("保  存");
+        popupButton.setTextColor(Color.parseColor("#ffffff"));
+        popupButton.setTextSize(getResources().getDimension(R.dimen._8dp));
         /*<- PopWindow*/
         scrollView = (ScrollView) findViewById(R.id.scrollView);//用以确定popupWindow位置
         /*弹窗LinearLayout布局 ->*/
         popLinearLayout = new LinearLayout(this);
+        popLinearLayout.setOrientation(1);//设置LinearLayout纵向
         popLinearLayout.addView(editTextCourseName);
         popLinearLayout.addView(editTextCourseWeek);
         popLinearLayout.addView(editTextCoursePlace);
         popLinearLayout.addView(editTextCourseTeacher);
         popLinearLayout.addView(popupButton);
-        popLinearLayout.setOrientation(1);//设置LinearLayout纵向
-        popLinearLayout.setBackground(getResources().getDrawable(R.drawable.button0_background));//设置背景色
+        popLinearLayout.setBackgroundColor(Color.parseColor("#ffffff"));//设置背景色
         /*<- 弹窗LinearLayout布局*/
+        /*PopWindow ->*/
         popupWindow = new PopupWindow(this);
         popupWindow.setContentView(popLinearLayout);
         popupWindow.setFocusable(true); // 设置PopupWindow可获得焦点
-        popupWindow.setTouchable(true); // 设置PopupWindow可触摸
-        popupWindow.setWidth(popupWindowWidth);
-        popupWindow.setHeight(popupWindowWidth);
-
+        popupWindow.setWidth(_256dp);
+//        popupWindow.setHeight(_256dp);
+        /*<- PopWindow*/
     }
 
     @Override/*按钮点击事件*/
@@ -148,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (!button[X][Y].getText().equals("")) {
             AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
             dialog.setTitle(courseNameArray[X][Y]);
-            dialog.setMessage("课程时间："+courseWeekArray[X][Y] + "\n上课地点：" + coursePlaceArray[X][Y] + "\n任课教师：" + courseTeacherArray[X][Y]);
+            dialog.setMessage("课程时间：" + courseWeekArray[X][Y] + "\n上课地点：" + coursePlaceArray[X][Y] + "\n任课教师：" + courseTeacherArray[X][Y]);
             dialog.setCancelable(true);
             dialog.show();
         }
@@ -190,8 +193,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 10; j++) {
                 LinearLayout.LayoutParams spaceLayoutParams = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT, buttonHeight);//布局参数
-                spaceLayoutParams.setMargins(buttonTopSpace, (int) getResources().getDimension(R.dimen.buttonSpace), 0, 0);//设置边距
+                        LinearLayout.LayoutParams.MATCH_PARENT, _58dp);//布局参数
+                spaceLayoutParams.setMargins(_2dp, (int) getResources().getDimension(R.dimen._12dp), 0, 0);//设置边距
                 /*Button*/
                 button[i][j] = new Button(this);
                 button[i][j].setLayoutParams(layoutParams);//设置Button大小
@@ -407,9 +410,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final Gson gson = new Gson();
         final Course course = gson.fromJson(JsonString, Course.class);
         editTextCourseName.setText(courseNameArray[X][Y]);//显示课程名称
+        editTextCourseName.setHint("课程名称：");//显示提示文字
         editTextCourseWeek.setText(courseWeekArray[X][Y]);//显示课程时间
+        editTextCourseWeek.setHint("课程时间：");
         editTextCoursePlace.setText(coursePlaceArray[X][Y]);//显示课程地点
+        editTextCoursePlace.setHint("上课地点：");
         editTextCourseTeacher.setText(courseTeacherArray[X][Y]);//显示任课教师
+        editTextCourseTeacher.setHint("任课教师：");
         /*点击事件*/
         popupButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -428,7 +435,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
         popupWindow.showAtLocation(scrollView, Gravity.CENTER, 0, 0);
     }
-
 
     /*删除JSON文件*/
     private void deleteJson(int X, int Y) {

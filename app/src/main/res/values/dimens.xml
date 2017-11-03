@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="buttonHeight">58dp</dimen>
-    <dimen name="buttonSpace">12dp</dimen>
-    <dimen name="buttonTopSpace">2dp</dimen>
-    <dimen name="popupWindowWidth">256dp</dimen>
-    <dimen name="popWindowHeight">60dp</dimen>
+    <dimen name="_2dp">2dp</dimen>
+    <dimen name="_8dp">8dp</dimen>
+    <dimen name="_12dp">12dp</dimen>
+    <dimen name="_30dp">30dp</dimen>
+    <dimen name="_58dp">58dp</dimen>
+    <dimen name="_60dp">60dp</dimen>
+    <dimen name="_200dp">200dp</dimen>
+    <dimen name="_256dp">256dp</dimen>
 </resources>
