@@ -5,13 +5,16 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -31,6 +34,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
@@ -64,12 +72,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ScrollView scrollView;//滚动布局，用以确定修改弹窗位置
     LinearLayout popLinearLayout;//“修改”弹窗动态线性布局
     PopupWindow popupWindow;//“修改”弹框
+    SwipeRefreshLayout swipeRefreshLayout;//下拉刷新
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Window window = getWindow();
+        window.setStatusBarColor(Color.parseColor("#303f9f"));
         day0 = (LinearLayout) findViewById(R.id.day0);
         day1 = (LinearLayout) findViewById(R.id.day1);
         day2 = (LinearLayout) findViewById(R.id.day2);
@@ -104,6 +115,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         getCourseArray();//获取课表数据
         addButton();//添加Button
         initPopupWindow();//添加PopupWindow控件
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                JsonString = getLocalJson("coursetable_json.txt");
+                saveData();
+                button = null;
+                System.gc();
+                day0.removeAllViews();
+                day1.removeAllViews();
+                day2.removeAllViews();
+                day3.removeAllViews();
+                day4.removeAllViews();
+                day5.removeAllViews();
+                day6.removeAllViews();
+                button = new Button[7][10];
+                addJson();
+                addButton();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
     }
 
     private void initPopupWindow() {
@@ -516,61 +548,53 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         course.getMondayCourse().set(i, new Course.DayCourse("", "", "", ""));
                     }
                 } else {
-
+                    course.setMondayCourse(addArrayList());
                 }
-            }
-            for (i = 0; i < 10; i++) {
                 if (course.getTuesdayCourse() != null) {
                     if (course.getTuesdayCourse().get(i) == null) {
                         course.getTuesdayCourse().set(i, new Course.DayCourse("", "", "", ""));
                     }
                 } else {
-
+                    course.setTuesdayCourse(addArrayList());
                 }
-            }
-            for (i = 0; i < 10; i++) {
                 if (course.getWednesdayCourse() != null) {
                     if (course.getWednesdayCourse().get(i) == null) {
                         course.getWednesdayCourse().set(i, new Course.DayCourse("", "", "", ""));
                     }
                 } else {
-
+                    course.setWednesdayCourse(addArrayList());
                 }
-            }
-            for (i = 0; i < 10; i++) {
                 if (course.getThursdayCourse() != null) {
                     if (course.getThursdayCourse().get(i) == null) {
                         course.getThursdayCourse().set(i, new Course.DayCourse("", "", "", ""));
                     }
                 } else {
-
+                    course.setThursdayCourse(addArrayList());
                 }
-            }
-            for (i = 0; i < 10; i++) {
                 if (course.getFridayCourse() != null) {
                     if (course.getFridayCourse().get(i) == null) {
                         course.getFridayCourse().set(i, new Course.DayCourse("", "", "", ""));
                     }
                 } else {
-
+                    course.setFridayCourse(addArrayList());
                 }
-            }
-            for (i = 0; i < 10; i++) {
                 if (course.getSaturdayCourse() != null) {
                     if (course.getSaturdayCourse().get(i) == null) {
                         course.getSaturdayCourse().set(i, new Course.DayCourse("", "", "", ""));
                     }
                 } else {
-
+                    course.setSaturdayCourse(addArrayList());
                 }
-            }
-            for (i = 0; i < 10; i++) {
                 if (course.getSundayCourse() != null) {
                     if (course.getSundayCourse().get(i) == null) {
                         course.getSundayCourse().set(i, new Course.DayCourse("", "", "", ""));
                     }
                 } else {
-
+                    ArrayList<Course.DayCourse> arrayList=new ArrayList<Course.DayCourse>();
+                    for (int j=0;j<10;j++){
+                        arrayList.add(new Course.DayCourse("","","",""));
+                    }
+                    course.setSundayCourse(addArrayList());
                 }
             }
             JsonString = gson.toJson(course);
@@ -578,5 +602,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "异常位置：void getCourseArray()\n异常类型：Exception", Toast.LENGTH_LONG).show();
         }
+    }
+
+    /*addJson()中间方法，填充一天的数据*/
+    private ArrayList<Course.DayCourse> addArrayList(){
+        ArrayList<Course.DayCourse> arrayList=new ArrayList<Course.DayCourse>();
+        for (int j=0;j<10;j++){
+            arrayList.add(new Course.DayCourse("","","",""));
+        }
+        return arrayList;
     }
 }
