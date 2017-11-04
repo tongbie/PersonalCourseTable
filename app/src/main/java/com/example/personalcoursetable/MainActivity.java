@@ -1,12 +1,12 @@
 package com.example.personalcoursetable;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.UiThread;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.personalcoursetable.Gson.Course;
@@ -54,15 +55,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int Permission_WRITE_EXTERNAL_STORAGE = 0x001;//读写权限
     private File file;//手机存储文件
     private boolean havePermission = false;//判断权限
-    EditText editTextCourseName;//课程名称修改框
-    EditText editTextCourseWeek;//课程时间修改框
-    EditText editTextCoursePlace;//课程地点修改框
-    EditText editTextCourseTeacher;//课程教师修改框
-    Button popupButton;//“修改”按钮
+    private EditText editTextCourseName;//课程名称修改框
+    private EditText editTextCourseWeek;//课程时间修改框
+    private EditText editTextCoursePlace;//课程地点修改框
+    private EditText editTextCourseTeacher;//课程教师修改框
+    private Button popupButton;//“修改”按钮
     private ScrollView scrollView;//滚动布局，用以确定修改弹窗位置
-    LinearLayout popLinearLayout;//“修改”弹窗动态线性布局
-    PopupWindow popupWindow;//“修改”弹框
-    SwipeRefreshLayout swipeRefreshLayout;//下拉刷新
+    private LinearLayout popLinearLayout;//“修改”弹窗动态线性布局
+    private PopupWindow popupWindow;//“修改”弹框
+    private SwipeRefreshLayout swipeRefreshLayout;//下拉刷新
 
 
     @Override
@@ -70,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Window window = getWindow();
-        window.setStatusBarColor(Color.parseColor("#303f9f"));
+        window.setStatusBarColor(Color.parseColor("#7ebeab"));//设置状态栏颜色
         day[0] = (LinearLayout) findViewById(R.id.day0);
         day[1] = (LinearLayout) findViewById(R.id.day1);
         day[2] = (LinearLayout) findViewById(R.id.day2);
@@ -104,78 +105,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         getCourseArray();//获取课表数据
         addButton();//添加Button
         initPopupWindow();//添加PopupWindow控件
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
-                dialog.setCancelable(false);
-                dialog.setTitle("警告");
-                dialog.setMessage("刷新将会清除本地的课程表数据（包含自定义编辑的内容)，是否继续？");
-                dialog.setNegativeButton("是", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        button = null;
-                        System.gc();
-                        for (int j = 0; j < 7; j++) {
-                            day[j].removeAllViews();
-                        }
-                        JsonString = getLocalJson("coursetable_json.txt");
-                        addJson();
-                        getCourseArray();
-                        saveData();
-                        button = new Button[7][10];
-                        addButton();
-                        swipeRefreshLayout.setRefreshing(false);
-                    }
-                });
-                dialog.setPositiveButton("否", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        swipeRefreshLayout.setRefreshing(false);
-                    }
-                });
-                dialog.show();
+        initRefresh();//添加下拉刷新
 
-            }
-        });
-    }
-
-    private void initPopupWindow() {
-        /*PopWindow ->*/
-        editTextCourseName = new EditText(this);//CourseName输入框
-        editTextCourseName.setWidth(_256dp);
-        editTextCourseWeek = new EditText(this);//CourseWeek输入框
-        editTextCourseWeek.setWidth(_256dp);
-        editTextCoursePlace = new EditText(this);//CoursePlace输入框
-        editTextCoursePlace.setWidth(_256dp);
-        editTextCourseTeacher = new EditText(this);//CourseTeacher输入框
-        editTextCourseTeacher.setWidth(_256dp);
-        popupButton = new Button(this);//弹窗按钮
-        popupButton.setBackgroundColor(Color.parseColor("#676767"));
-        popupButton.setWidth(_256dp);
-        popupButton.setText("保  存");
-        popupButton.setTextColor(Color.parseColor("#ffffff"));
-        popupButton.setTextSize(getResources().getDimension(R.dimen._8dp));
-        /*<- PopWindow*/
-        scrollView = (ScrollView) findViewById(R.id.scrollView);//用以确定popupWindow位置
-        /*弹窗LinearLayout布局 ->*/
-        popLinearLayout = new LinearLayout(this);
-        popLinearLayout.setOrientation(1);//设置LinearLayout纵向
-        popLinearLayout.addView(editTextCourseName);
-        popLinearLayout.addView(editTextCourseWeek);
-        popLinearLayout.addView(editTextCoursePlace);
-        popLinearLayout.addView(editTextCourseTeacher);
-        popLinearLayout.addView(popupButton);
-        popLinearLayout.setBackgroundColor(Color.parseColor("#ffffff"));//设置背景色
-        /*<- 弹窗LinearLayout布局*/
-        /*PopWindow ->*/
-        popupWindow = new PopupWindow(this);
-        popupWindow.setContentView(popLinearLayout);
-        popupWindow.setFocusable(true); // 设置PopupWindow可获得焦点
-        popupWindow.setWidth(_256dp);
-//        popupWindow.setHeight(_256dp);
-        /*<- PopWindow*/
     }
 
     @Override/*按钮点击事件*/
@@ -224,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /*添加Button*/
+    @SuppressLint("WrongConstant")
     private void addButton() {
         for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 10; j++) {
@@ -233,10 +165,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 /*Button*/
                 button[i][j] = new Button(this);
                 button[i][j].setLayoutParams(layoutParams);//设置Button大小
+                button[i][j].setTextAppearance(getApplicationContext(), R.style.Widget_AppCompat_Button_Borderless);
                 button[i][j].setTag(new ButtonPosition(i, j));//设置坐标
                 button[i][j].setTextColor(Color.parseColor("#ffffff"));//设置文字颜色
                 button[i][j].setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11);//设置文字大小
                 button[i][j].setText(courseNameArray[i][j]);//设置文字
+                //button[i][j].setStyle(R.style.Widget_AppCompat_Button_Borderless);
                 if (j == 4 || j == 8) {//设置分割线
                     button[i][j].setLayoutParams(spaceLayoutParams);
                 }
@@ -244,71 +178,65 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 button[i][j].setOnLongClickListener(this);
                 if (i == 0) {//向布局中添加Button并设置Button背景
                     if (j < 4) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button0_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button0));
                     } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button1_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button1));
                     } else {
-                        button[i][j].setBackground(getDrawable(R.drawable.button2_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button2));
                     }
-                    day[0].addView(button[i][j]);
                 } else if (i == 1) {
                     if (j < 4) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button1_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button1));
                     } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button2_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button2));
                     } else {
-                        button[i][j].setBackground(getDrawable(R.drawable.button3_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button3));
                     }
-                    day[1].addView(button[i][j]);
                 } else if (i == 2) {
                     if (j < 4) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button2_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button2));
                     } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button3_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button3));
                     } else {
-                        button[i][j].setBackground(getDrawable(R.drawable.button4_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button4));
                     }
-                    day[2].addView(button[i][j]);
                 } else if (i == 3) {
                     if (j < 4) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button3_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button3));
                     } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button4_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button4));
                     } else {
-                        button[i][j].setBackground(getDrawable(R.drawable.button5_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button5));
                     }
-                    day[3].addView(button[i][j]);
                 } else if (i == 4) {
                     if (j < 4) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button4_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button4));
                     } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button5_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button5));
                     } else {
-                        button[i][j].setBackground(getDrawable(R.drawable.button6_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button6));
                     }
-                    day[4].addView(button[i][j]);
                 } else if (i == 5) {
                     if (j < 4) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button5_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button5));
                     } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button6_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button6));
                     } else {
-                        button[i][j].setBackground(getDrawable(R.drawable.button0_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button0));
                     }
-                    day[5].addView(button[i][j]);
                 } else if (i == 6) {
                     if (j < 4) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button6_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button6));
                     } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button0_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button0));
                     } else {
-                        button[i][j].setBackground(getDrawable(R.drawable.button1_background));
+                        button[i][j].setBackground(getDrawable(R.drawable.button1));
                     }
-                    day[6].addView(button[i][j]);
                 }
                 if (button[i][j].getText().equals("")) {//隐藏无内容Button
                     button[i][j].setBackgroundColor(Color.parseColor("#00000000"));
                 }
+                day[i].addView(button[i][j]);
             }
         }
     }
@@ -464,7 +392,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 coursePlaceArray[X][Y] = editTextCoursePlace.getText().toString();
                 courseTeacherArray[X][Y] = editTextCourseTeacher.getText().toString();
                 button[X][Y].setText(editTextCourseName.getText().toString());
-                button[X][Y].setBackground(getDrawable(R.drawable.new_button_background));
+                button[X][Y].setBackground(getDrawable(R.drawable.button_new));
                 popupWindow.dismiss();
             }
         });
@@ -614,5 +542,88 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             arrayList.add(new Course.DayCourse("", "", "", ""));
         }
         return arrayList;
+    }
+
+    /*添加修改弹窗*/
+    private void initPopupWindow() {
+        /*PopWindow ->*/
+        editTextCourseName = new EditText(this);//CourseName输入框
+        editTextCourseName.setWidth(_256dp);
+        editTextCourseWeek = new EditText(this);//CourseWeek输入框
+        editTextCourseWeek.setWidth(_256dp);
+        editTextCoursePlace = new EditText(this);//CoursePlace输入框
+        editTextCoursePlace.setWidth(_256dp);
+        editTextCourseTeacher = new EditText(this);//CourseTeacher输入框
+        editTextCourseTeacher.setWidth(_256dp);
+        popupButton = new Button(this);//弹窗按钮
+        popupButton.setBackgroundColor(Color.parseColor("#676767"));
+        popupButton.setWidth(_256dp);
+        popupButton.setText("保  存");
+        popupButton.setTextColor(Color.parseColor("#ffffff"));
+        popupButton.setTextSize(getResources().getDimension(R.dimen._8dp));
+        /*<- PopWindow*/
+        scrollView = (ScrollView) findViewById(R.id.scrollView);//用以确定popupWindow位置
+        /*弹窗LinearLayout布局 ->*/
+        popLinearLayout = new LinearLayout(this);
+        popLinearLayout.setOrientation(1);//设置LinearLayout纵向
+        popLinearLayout.addView(editTextCourseName);
+        popLinearLayout.addView(editTextCourseWeek);
+        popLinearLayout.addView(editTextCoursePlace);
+        popLinearLayout.addView(editTextCourseTeacher);
+        popLinearLayout.addView(popupButton);
+        popLinearLayout.setBackgroundColor(Color.parseColor("#ffffff"));//设置背景色
+        /*<- 弹窗LinearLayout布局*/
+        /*PopWindow ->*/
+        popupWindow = new PopupWindow(this);
+        popupWindow.setContentView(popLinearLayout);
+        popupWindow.setFocusable(true); // 设置PopupWindow可获得焦点
+        popupWindow.setWidth(_256dp);
+//        popupWindow.setHeight(_256dp);
+        /*<- PopWindow*/
+    }
+
+    /*添加下拉刷新*/
+    private void initRefresh() {
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorRefresh);//主题
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (swipeRefreshLayout.getVerticalScrollbarPosition() == 0) {//判断页面是否在最上方
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                    dialog.setCancelable(false);
+                    dialog.setTitle("警告");
+                    dialog.setMessage("刷新将会清除本地的课程表数据\n（包含自定义编辑的内容)，\n      是否继续？");
+                    dialog.setNegativeButton("是", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            button = null;
+                            System.gc();
+                            for (int j = 0; j < 7; j++) {
+                                day[j].removeAllViews();
+                            }
+                            JsonString = getLocalJson("coursetable_json.txt");
+                            addJson();
+                            getCourseArray();
+                            saveData();
+                            button = new Button[7][10];
+                            addButton();
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                    });
+                    dialog.setPositiveButton("否", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                    });
+                    dialog.show();
+                } else {
+                    swipeRefreshLayout.setRefreshing(false);
+                    return;
+                }
+
+            }
+        });
     }
 }

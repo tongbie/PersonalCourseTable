@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ebebeb"
+    android:background="#ede4cd"
     android:orientation="vertical"
     tools:context="com.example.personalcoursetable.MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="#303f9f">
+        android:background="#7ebeab">
 
         <TextView
             android:layout_width="match_parent"
@@ -23,6 +23,7 @@
             android:textSize="24dp" />
     </LinearLayout>
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="25dp">
@@ -31,7 +32,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.5"
-            android:background="#303f9f"></LinearLayout>
+            android:background="@drawable/empty">
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="0dp"
@@ -47,7 +49,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="14"
-                android:background="#303f9f"
+                android:background="@drawable/day0"
                 android:gravity="center"
                 android:text="周一"
                 android:textColor="#ffffff"
@@ -68,7 +70,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="14"
-                android:background="#303f9f"
+                android:background="@drawable/day1"
                 android:gravity="center"
                 android:text="周二"
                 android:textColor="#ffffff"
@@ -89,7 +91,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="14"
-                android:background="#303f9f"
+                android:background="@drawable/day2"
                 android:gravity="center"
                 android:text="周三"
                 android:textColor="#ffffff"
@@ -110,7 +112,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="14"
-                android:background="#303f9f"
+                android:background="@drawable/day3"
                 android:gravity="center"
                 android:text="周四"
                 android:textColor="#ffffff"
@@ -131,7 +133,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="14"
-                android:background="#303f9f"
+                android:background="@drawable/day4"
                 android:gravity="center"
                 android:text="周五"
                 android:textColor="#ffffff"
@@ -152,7 +154,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="14"
-                android:background="#303f9f"
+                android:background="@drawable/day5"
                 android:gravity="center"
                 android:text="周六"
                 android:textColor="#ffffff"
@@ -173,7 +175,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="14"
-                android:background="#303f9f"
+                android:background="@drawable/day6"
                 android:gravity="center"
                 android:text="周日"
                 android:textColor="#ffffff"
@@ -217,7 +219,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="14"
-                            android:background="#303f9f"
+                            android:background="@drawable/lesson0"
                             android:gravity="center"
                             android:text="1"
                             android:textColor="#ffffff"
@@ -238,7 +240,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="14"
-                            android:background="#303f9f"
+                            android:background="@drawable/lesson0"
                             android:gravity="center"
                             android:text="2"
                             android:textColor="#ffffff"
@@ -259,7 +261,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="14"
-                            android:background="#303f9f"
+                            android:background="@drawable/lesson0"
                             android:gravity="center"
                             android:text="3"
                             android:textColor="#ffffff"
@@ -280,7 +282,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="14"
-                            android:background="#303f9f"
+                            android:background="@drawable/lesson0"
                             android:gravity="center"
                             android:text="4"
                             android:textColor="#ffffff"
@@ -306,7 +308,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="14"
-                            android:background="#303f9f"
+                            android:background="@drawable/lesson1"
                             android:gravity="center"
                             android:text="5"
                             android:textColor="#ffffff"
@@ -328,7 +330,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="14"
-                            android:background="#303f9f"
+                            android:background="@drawable/lesson1"
                             android:gravity="center"
                             android:text="6"
                             android:textColor="#ffffff"
@@ -349,7 +351,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="14"
-                            android:background="#303f9f"
+                            android:background="@drawable/lesson1"
                             android:gravity="center"
                             android:text="7"
                             android:textColor="#ffffff"
@@ -370,7 +372,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="14"
-                            android:background="#303f9f"
+                            android:background="@drawable/lesson1"
                             android:gravity="center"
                             android:text="8"
                             android:textColor="#ffffff"
@@ -396,7 +398,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="14"
-                            android:background="#303f9f"
+                            android:background="@drawable/lesson2"
                             android:gravity="center"
                             android:text="9"
                             android:textColor="#ffffff"
@@ -417,7 +419,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="14"
-                            android:background="#303f9f"
+                            android:background="@drawable/lesson2"
                             android:gravity="center"
                             android:text="0"
                             android:textColor="#ffffff"
