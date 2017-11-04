@@ -1,6 +1,7 @@
 package com.example.personalcoursetable;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -35,10 +36,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
@@ -46,16 +43,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button button[][] = new Button[7][10];//Button数组
     private LinearLayout.LayoutParams layoutParams;//布局参数
     private int _2dp;//相邻Button间隔
-    private LinearLayout day0;//周一LinearLayout
-    private LinearLayout day1;//周二
-    private LinearLayout day2;//周三
-    private LinearLayout day3;//周四
-    private LinearLayout day4;//周五
-    private LinearLayout day5;//周六
-    private LinearLayout day6;//周日
+    private LinearLayout[] day = new LinearLayout[7];//每天LinearLayout
     private int _58dp;//按钮高度
     private int _256dp;//弹窗高度
-    private int _30dp;
     private String JsonString;//课表Json字符串
     private String[][] courseNameArray = new String[7][10];//课程名称
     private String[][] courseWeekArray = new String[7][10];//课程时间
@@ -81,17 +71,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         Window window = getWindow();
         window.setStatusBarColor(Color.parseColor("#303f9f"));
-        day0 = (LinearLayout) findViewById(R.id.day0);
-        day1 = (LinearLayout) findViewById(R.id.day1);
-        day2 = (LinearLayout) findViewById(R.id.day2);
-        day3 = (LinearLayout) findViewById(R.id.day3);
-        day4 = (LinearLayout) findViewById(R.id.day4);
-        day5 = (LinearLayout) findViewById(R.id.day5);
-        day6 = (LinearLayout) findViewById(R.id.day6);
+        day[0] = (LinearLayout) findViewById(R.id.day0);
+        day[1] = (LinearLayout) findViewById(R.id.day1);
+        day[2] = (LinearLayout) findViewById(R.id.day2);
+        day[3] = (LinearLayout) findViewById(R.id.day3);
+        day[4] = (LinearLayout) findViewById(R.id.day4);
+        day[5] = (LinearLayout) findViewById(R.id.day5);
+        day[6] = (LinearLayout) findViewById(R.id.day6);
         _58dp = (int) getResources().getDimension(R.dimen._58dp);//指定Button高度（res/values/dimens/...）
         _2dp = (int) getResources().getDimension(R.dimen._2dp);//相邻Button间隔
         _256dp = (int) getResources().getDimension(R.dimen._256dp);
-        _30dp = (int) getResources().getDimension(R.dimen._30dp);
         /*权限 ->*/
         if (ContextCompat.checkSelfPermission(MainActivity.this, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{WRITE_EXTERNAL_STORAGE}, Permission_WRITE_EXTERNAL_STORAGE);
@@ -119,21 +108,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                JsonString = getLocalJson("coursetable_json.txt");
-                saveData();
-                button = null;
-                System.gc();
-                day0.removeAllViews();
-                day1.removeAllViews();
-                day2.removeAllViews();
-                day3.removeAllViews();
-                day4.removeAllViews();
-                day5.removeAllViews();
-                day6.removeAllViews();
-                button = new Button[7][10];
-                addJson();
-                addButton();
-                swipeRefreshLayout.setRefreshing(false);
+                AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                dialog.setCancelable(false);
+                dialog.setTitle("警告");
+                dialog.setMessage("刷新将会清除本地的课程表数据（包含自定义编辑的内容)，是否继续？");
+                dialog.setNegativeButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        button = null;
+                        System.gc();
+                        for (int j = 0; j < 7; j++) {
+                            day[j].removeAllViews();
+                        }
+                        JsonString = getLocalJson("coursetable_json.txt");
+                        addJson();
+                        getCourseArray();
+                        saveData();
+                        button = new Button[7][10];
+                        addButton();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                });
+                dialog.setPositiveButton("否", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                });
+                dialog.show();
+
             }
         });
     }
@@ -247,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     } else {
                         button[i][j].setBackground(getDrawable(R.drawable.button2_background));
                     }
-                    day0.addView(button[i][j]);
+                    day[0].addView(button[i][j]);
                 } else if (i == 1) {
                     if (j < 4) {
                         button[i][j].setBackground(getDrawable(R.drawable.button1_background));
@@ -256,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     } else {
                         button[i][j].setBackground(getDrawable(R.drawable.button3_background));
                     }
-                    day1.addView(button[i][j]);
+                    day[1].addView(button[i][j]);
                 } else if (i == 2) {
                     if (j < 4) {
                         button[i][j].setBackground(getDrawable(R.drawable.button2_background));
@@ -265,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     } else {
                         button[i][j].setBackground(getDrawable(R.drawable.button4_background));
                     }
-                    day2.addView(button[i][j]);
+                    day[2].addView(button[i][j]);
                 } else if (i == 3) {
                     if (j < 4) {
                         button[i][j].setBackground(getDrawable(R.drawable.button3_background));
@@ -274,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     } else {
                         button[i][j].setBackground(getDrawable(R.drawable.button5_background));
                     }
-                    day3.addView(button[i][j]);
+                    day[3].addView(button[i][j]);
                 } else if (i == 4) {
                     if (j < 4) {
                         button[i][j].setBackground(getDrawable(R.drawable.button4_background));
@@ -283,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     } else {
                         button[i][j].setBackground(getDrawable(R.drawable.button6_background));
                     }
-                    day4.addView(button[i][j]);
+                    day[4].addView(button[i][j]);
                 } else if (i == 5) {
                     if (j < 4) {
                         button[i][j].setBackground(getDrawable(R.drawable.button5_background));
@@ -292,7 +295,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     } else {
                         button[i][j].setBackground(getDrawable(R.drawable.button0_background));
                     }
-                    day5.addView(button[i][j]);
+                    day[5].addView(button[i][j]);
                 } else if (i == 6) {
                     if (j < 4) {
                         button[i][j].setBackground(getDrawable(R.drawable.button6_background));
@@ -301,7 +304,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     } else {
                         button[i][j].setBackground(getDrawable(R.drawable.button1_background));
                     }
-                    day6.addView(button[i][j]);
+                    day[6].addView(button[i][j]);
                 }
                 if (button[i][j].getText().equals("")) {//隐藏无内容Button
                     button[i][j].setBackgroundColor(Color.parseColor("#00000000"));
@@ -354,7 +357,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return JsonString;
     }
 
-    /*获取课表数据，置入courseArray和courseNameArray*/
+    /*获取课表数据，置入courseNameArray*/
     private void getCourseArray() {
         int i;
         Gson gson = new Gson();
@@ -590,9 +593,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         course.getSundayCourse().set(i, new Course.DayCourse("", "", "", ""));
                     }
                 } else {
-                    ArrayList<Course.DayCourse> arrayList=new ArrayList<Course.DayCourse>();
-                    for (int j=0;j<10;j++){
-                        arrayList.add(new Course.DayCourse("","","",""));
+                    ArrayList<Course.DayCourse> arrayList = new ArrayList<Course.DayCourse>();
+                    for (int j = 0; j < 10; j++) {
+                        arrayList.add(new Course.DayCourse("", "", "", ""));
                     }
                     course.setSundayCourse(addArrayList());
                 }
@@ -605,10 +608,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /*addJson()中间方法，填充一天的数据*/
-    private ArrayList<Course.DayCourse> addArrayList(){
-        ArrayList<Course.DayCourse> arrayList=new ArrayList<Course.DayCourse>();
-        for (int j=0;j<10;j++){
-            arrayList.add(new Course.DayCourse("","","",""));
+    private ArrayList<Course.DayCourse> addArrayList() {
+        ArrayList<Course.DayCourse> arrayList = new ArrayList<Course.DayCourse>();
+        for (int j = 0; j < 10; j++) {
+            arrayList.add(new Course.DayCourse("", "", "", ""));
         }
         return arrayList;
     }
