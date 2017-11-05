@@ -22,7 +22,6 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.personalcoursetable.Gson.Course;
@@ -64,7 +63,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private LinearLayout popLinearLayout;//“修改”弹窗动态线性布局
     private PopupWindow popupWindow;//“修改”弹框
     private SwipeRefreshLayout swipeRefreshLayout;//下拉刷新
-
+    private int[][] courseLength = new int[7][10];//课程长度
+    private String LongButtonJsonString="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +103,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }/*<- 文件读写*/
         addJson();//将JSON中的null填充
         getCourseArray();//获取课表数据
-        addButton();//添加Button
+        //addButton();//添加Button
+        for (int i = 0; i < 7; i++)//初始化课表长度
+            for (int j = 0; j < 10; j++)
+                courseLength[i][j] = 1;
+        setCourseLength();//设置课程长度
+        addLongCourse();
         initPopupWindow();//添加PopupWindow控件
         initRefresh();//添加下拉刷新
 
@@ -157,11 +162,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /*添加Button*/
     @SuppressLint("WrongConstant")
     private void addButton() {
+        LinearLayout.LayoutParams spaceLayoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, _58dp);//布局参数
+        spaceLayoutParams.setMargins(_2dp, (int) getResources().getDimension(R.dimen._12dp), 0, 0);//设置边距
         for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 10; j++) {
-                LinearLayout.LayoutParams spaceLayoutParams = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT, _58dp);//布局参数
-                spaceLayoutParams.setMargins(_2dp, (int) getResources().getDimension(R.dimen._12dp), 0, 0);//设置边距
                 /*Button*/
                 button[i][j] = new Button(this);
                 button[i][j].setLayoutParams(layoutParams);//设置Button大小
@@ -170,69 +175,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 button[i][j].setTextColor(Color.parseColor("#ffffff"));//设置文字颜色
                 button[i][j].setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11);//设置文字大小
                 button[i][j].setText(courseNameArray[i][j]);//设置文字
-                //button[i][j].setStyle(R.style.Widget_AppCompat_Button_Borderless);
                 if (j == 4 || j == 8) {//设置分割线
                     button[i][j].setLayoutParams(spaceLayoutParams);
                 }
                 button[i][j].setOnClickListener(this);//Button点击事件
                 button[i][j].setOnLongClickListener(this);
-                if (i == 0) {//向布局中添加Button并设置Button背景
-                    if (j < 4) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button0));
-                    } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button1));
-                    } else {
-                        button[i][j].setBackground(getDrawable(R.drawable.button2));
-                    }
-                } else if (i == 1) {
-                    if (j < 4) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button1));
-                    } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button2));
-                    } else {
-                        button[i][j].setBackground(getDrawable(R.drawable.button3));
-                    }
-                } else if (i == 2) {
-                    if (j < 4) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button2));
-                    } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button3));
-                    } else {
-                        button[i][j].setBackground(getDrawable(R.drawable.button4));
-                    }
-                } else if (i == 3) {
-                    if (j < 4) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button3));
-                    } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button4));
-                    } else {
-                        button[i][j].setBackground(getDrawable(R.drawable.button5));
-                    }
-                } else if (i == 4) {
-                    if (j < 4) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button4));
-                    } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button5));
-                    } else {
-                        button[i][j].setBackground(getDrawable(R.drawable.button6));
-                    }
-                } else if (i == 5) {
-                    if (j < 4) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button5));
-                    } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button6));
-                    } else {
-                        button[i][j].setBackground(getDrawable(R.drawable.button0));
-                    }
-                } else if (i == 6) {
-                    if (j < 4) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button6));
-                    } else if (j >= 4 && j < 8) {
-                        button[i][j].setBackground(getDrawable(R.drawable.button0));
-                    } else {
-                        button[i][j].setBackground(getDrawable(R.drawable.button1));
-                    }
-                }
+                setButtonBackgroundColor(i, j);
                 if (button[i][j].getText().equals("")) {//隐藏无内容Button
                     button[i][j].setBackgroundColor(Color.parseColor("#00000000"));
                 }
@@ -591,29 +539,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onRefresh() {
                 if (swipeRefreshLayout.getVerticalScrollbarPosition() == 0) {//判断页面是否在最上方
                     AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
-                    dialog.setCancelable(false);
-                    dialog.setTitle("警告");
-                    dialog.setMessage("刷新将会清除本地的课程表数据\n（包含自定义编辑的内容)，\n      是否继续？");
-                    dialog.setNegativeButton("是", new DialogInterface.OnClickListener() {
+                    dialog.setCancelable(true);
+                    dialog.setTitle("说明：");
+                    dialog.setMessage("* 初始化将会清除本地的课程表数据\n    （包含自定义编辑的内容)\n* 编辑内容将于重启后生效\n    编辑模式下长按可进行修改");
+                    dialog.setNegativeButton("初始化", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            button = null;
-                            System.gc();
-                            for (int j = 0; j < 7; j++) {
-                                day[j].removeAllViews();
-                            }
+                            freeButton();
                             JsonString = getLocalJson("coursetable_json.txt");
                             addJson();
                             getCourseArray();
-                            saveData();
-                            button = new Button[7][10];
-                            addButton();
+                            addLongCourse();
                             swipeRefreshLayout.setRefreshing(false);
                         }
                     });
-                    dialog.setPositiveButton("否", new DialogInterface.OnClickListener() {
+                    dialog.setPositiveButton("编辑模式", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
+                            freeButton();
+                            if (file.exists() && havePermission) {
+                                JsonString = getJsonStringFromMemory();
+                            } else {
+                                JsonString = getLocalJson("coursetable_json.txt");
+                            }
+                            getCourseArray();
+                            addButton();
+                            saveData();
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                    });
+                    dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialogInterface) {
                             swipeRefreshLayout.setRefreshing(false);
                         }
                     });
@@ -625,5 +582,127 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
+    }
+
+    /*设置课程长度*/
+    private void setCourseLength() {
+        Gson gson = new Gson();
+        Course course = gson.fromJson(JsonString, Course.class);
+        for (int i = 0; i < 7; i++) {
+            for (int j = 8; j >= 0; j--) {
+                if (!courseNameArray[i][j].equals("")) {//禁止比较空格
+                    if (j >= 0 && j < 3 || j >= 4 && j < 7 || j >= 8 && j < 9) {//禁止跨时段比较
+                        if (courseNameArray[i][j].equals(courseNameArray[i][j + 1])) {//连接同名课程
+                            courseLength[i][j] = courseLength[i][j + 1] + 1;
+                            courseLength[i][j + 1] = courseLength[i][j + 1] - courseLength[i][j + 1];
+                            setJson(course, i, j + 1, "", "", "", "");
+                            LongButtonJsonString = gson.toJson(course);
+                            getCourseArray();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /*添加长按钮*/
+    private void addLongCourse() {
+        for (int i = 0; i < 7; i++) {
+            for (int j = 0; j < 10; j++) {
+                button[i][j] = new Button(this);
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, courseLength[i][j] * _58dp);//布局参数
+                layoutParams.setMargins(_2dp, (int) getResources().getDimension(R.dimen._2dp), 0, 0);//设置边距
+                LinearLayout.LayoutParams spaceLayoutParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, courseLength[i][j] * _58dp);//布局参数
+                spaceLayoutParams.setMargins(_2dp, (int) getResources().getDimension(R.dimen._12dp), 0, 0);//设置边距
+                button[i][j].setLayoutParams(layoutParams);//设置Button大小
+                button[i][j].setTextAppearance(getApplicationContext(), R.style.Widget_AppCompat_Button_Borderless);
+                button[i][j].setTag(new ButtonPosition(i, j));//设置坐标
+                button[i][j].setTextColor(Color.parseColor("#ffffff"));//设置文字颜色
+                button[i][j].setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11);//设置文字大小
+                button[i][j].setText(courseNameArray[i][j] + "\n" + coursePlaceArray[i][j] + "\n" + courseTeacherArray[i][j]);//设置文字
+                button[i][j].setBackground(getDrawable(R.drawable.button0));
+                if (j == 4 || j == 8) {//设置分割线
+                    button[i][j].setLayoutParams(spaceLayoutParams);
+                }
+                setButtonBackgroundColor(i, j);
+                if (button[i][j].getText().charAt(0) == '\n' || button[i][j].getText().equals("")) {
+                    button[i][j].setBackgroundColor(Color.parseColor("#00000000"));
+                }
+                day[i].addView(button[i][j]);
+            }
+        }
+    }
+
+    /*添加按钮背景色*/
+    private void setButtonBackgroundColor(int i, int j) {
+        if (i == 0) {//向布局中添加Button并设置Button背景
+            if (j < 4) {
+                button[i][j].setBackground(getDrawable(R.drawable.button0));
+            } else if (j >= 4 && j < 8) {
+                button[i][j].setBackground(getDrawable(R.drawable.button1));
+            } else {
+                button[i][j].setBackground(getDrawable(R.drawable.button2));
+            }
+        } else if (i == 1) {
+            if (j < 4) {
+                button[i][j].setBackground(getDrawable(R.drawable.button1));
+            } else if (j >= 4 && j < 8) {
+                button[i][j].setBackground(getDrawable(R.drawable.button2));
+            } else {
+                button[i][j].setBackground(getDrawable(R.drawable.button3));
+            }
+        } else if (i == 2) {
+            if (j < 4) {
+                button[i][j].setBackground(getDrawable(R.drawable.button2));
+            } else if (j >= 4 && j < 8) {
+                button[i][j].setBackground(getDrawable(R.drawable.button3));
+            } else {
+                button[i][j].setBackground(getDrawable(R.drawable.button4));
+            }
+        } else if (i == 3) {
+            if (j < 4) {
+                button[i][j].setBackground(getDrawable(R.drawable.button3));
+            } else if (j >= 4 && j < 8) {
+                button[i][j].setBackground(getDrawable(R.drawable.button4));
+            } else {
+                button[i][j].setBackground(getDrawable(R.drawable.button5));
+            }
+        } else if (i == 4) {
+            if (j < 4) {
+                button[i][j].setBackground(getDrawable(R.drawable.button4));
+            } else if (j >= 4 && j < 8) {
+                button[i][j].setBackground(getDrawable(R.drawable.button5));
+            } else {
+                button[i][j].setBackground(getDrawable(R.drawable.button6));
+            }
+        } else if (i == 5) {
+            if (j < 4) {
+                button[i][j].setBackground(getDrawable(R.drawable.button5));
+            } else if (j >= 4 && j < 8) {
+                button[i][j].setBackground(getDrawable(R.drawable.button6));
+            } else {
+                button[i][j].setBackground(getDrawable(R.drawable.button0));
+            }
+        } else if (i == 6) {
+            if (j < 4) {
+                button[i][j].setBackground(getDrawable(R.drawable.button6));
+            } else if (j >= 4 && j < 8) {
+                button[i][j].setBackground(getDrawable(R.drawable.button0));
+            } else {
+                button[i][j].setBackground(getDrawable(R.drawable.button1));
+            }
+        }
+    }
+
+    /*释放Button空间，清空屏幕*/
+    private void freeButton() {
+        button = null;
+        System.gc();
+        for (int j = 0; j < 7; j++) {
+            day[j].removeAllViews();
+        }
+        button = new Button[7][10];
     }
 }
