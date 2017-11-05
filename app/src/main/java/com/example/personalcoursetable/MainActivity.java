@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private PopupWindow popupWindow;//“修改”弹框
     private SwipeRefreshLayout swipeRefreshLayout;//下拉刷新
     private int[][] courseLength = new int[7][10];//课程长度
-    private String LongButtonJsonString="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -596,7 +595,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             courseLength[i][j] = courseLength[i][j + 1] + 1;
                             courseLength[i][j + 1] = courseLength[i][j + 1] - courseLength[i][j + 1];
                             setJson(course, i, j + 1, "", "", "", "");
-                            LongButtonJsonString = gson.toJson(course);
+                            JsonString = gson.toJson(course);
                             getCourseArray();
                         }
                     }
