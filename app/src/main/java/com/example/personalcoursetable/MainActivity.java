@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private LinearLayout.LayoutParams layoutParams;//布局参数
     private int _2dp;//相邻Button间隔
     private LinearLayout[] day = new LinearLayout[7];//每天LinearLayout
+    private int _0dp;
     private int _58dp;//按钮高度
     private int _256dp;//弹窗高度
     private String JsonString;//课表Json字符串
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         day[4] = (LinearLayout) findViewById(R.id.day4);
         day[5] = (LinearLayout) findViewById(R.id.day5);
         day[6] = (LinearLayout) findViewById(R.id.day6);
+        _0dp = (int) getResources().getDimension(R.dimen._0dp);
         _58dp = (int) getResources().getDimension(R.dimen._58dp);//指定Button高度（res/values/dimens/...）
         _2dp = (int) getResources().getDimension(R.dimen._2dp);//相邻Button间隔
         _256dp = (int) getResources().getDimension(R.dimen._256dp);
@@ -289,10 +291,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             fileOutputStream.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            Toast.makeText(getApplicationContext(), "saveData()\n"+e.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "saveData()\n" + e.toString(), Toast.LENGTH_LONG).show();
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(getApplicationContext(), "saveData()\n"+e.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "saveData()\n" + e.toString(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -304,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String text = buffer.readLine();//读取文件
             return text;
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "getJsonStringFromMemory()/n"+e.toString(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "getJsonStringFromMemory()/n" + e.toString(), Toast.LENGTH_SHORT).show();
         }
         return "";
     }
@@ -404,7 +406,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 default:
             }
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "setJson(...)\n"+e.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "setJson(...)\n" + e.toString(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -471,7 +473,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             JsonString = gson.toJson(course);
             saveData();
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "void getCourseArray()\n"+e.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "void getCourseArray()\n" + e.toString(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -601,26 +603,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /*添加长按钮*/
     private void addLongCourse() {
-        LinearLayout.LayoutParams longCourseLayoutParams;//课程按钮布局
-        LinearLayout.LayoutParams longCourseSpaceLayoutParams;//带空隙课程布局
+        LinearLayout.LayoutParams longLayoutParams = null;
         for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 10; j++) {
                 button[i][j] = new Button(this);
-                longCourseLayoutParams = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT, courseLength[i][j] * _58dp);//布局参数
-                longCourseLayoutParams.setMargins(_2dp, (int) getResources().getDimension(R.dimen._2dp), 0, 0);//设置边距
-                longCourseSpaceLayoutParams = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT, courseLength[i][j] * _58dp);//布局参数
-                longCourseSpaceLayoutParams.setMargins(_2dp, (int) getResources().getDimension(R.dimen._12dp), 0, 0);//设置边距
-                button[i][j].setLayoutParams(longCourseLayoutParams);//设置Button大小
+                longLayoutParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, courseLength[i][j] * _58dp + (courseLength[i][j] - 1) * _2dp);
+                longLayoutParams.setMargins(_2dp, (int) getResources().getDimension(R.dimen._2dp), 0, 0);//设置边距
+                button[i][j].setLayoutParams(longLayoutParams);//设置Button大小
+                if(courseLength[i][j]==0){
+                    longLayoutParams = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT, _0dp);
+                    longLayoutParams.setMargins(_2dp, 0, 0, 0);//设置边距
+                    button[i][j].setLayoutParams(longLayoutParams);
+                }
+                if (j == 4 || j == 8) {//设置分割线
+                    longLayoutParams = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT, courseLength[i][j] * _58dp + (courseLength[i][j] - 1) * _2dp);
+                    longLayoutParams.setMargins(_2dp, (int) getResources().getDimension(R.dimen._12dp), 0, 0);
+                    button[i][j].setLayoutParams(longLayoutParams);
+                }
                 button[i][j].setTextAppearance(getApplicationContext(), R.style.Widget_AppCompat_Button_Borderless);//主题？未生效
                 button[i][j].setTag(new ButtonPosition(i, j));//设置坐标
                 button[i][j].setTextColor(Color.parseColor("#ffffff"));//设置文字颜色
                 button[i][j].setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11);//设置文字大小
                 button[i][j].setText(courseNameArray[i][j] + "\n" + coursePlaceArray[i][j] + "\n" + courseTeacherArray[i][j]);//设置文字
-                if (j == 4 || j == 8) {//设置分割线
-                    button[i][j].setLayoutParams(longCourseSpaceLayoutParams);
-                }
                 setButtonBackgroundColor(i, j);//设置背景
                 if (button[i][j].getText().charAt(0) == '\n' || button[i][j].getText().equals("")) {//隐藏空Button
                     button[i][j].setBackgroundColor(Color.parseColor("#00000000"));
