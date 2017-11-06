@@ -51,7 +51,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String[][] courseWeekArray = new String[7][10];//课程时间
     private String[][] coursePlaceArray = new String[7][10];//课程地点
     private String[][] courseTeacherArray = new String[7][10];//课程教师
-    private int Permission_WRITE_EXTERNAL_STORAGE = 0x001;//读写权限
+    private int[][] courseLength = new int[7][10];//课程长度
+    private int PERMISSION_WRITE_EXTERNAL_STORAGE = 0x001;//读写权限
     private File file;//手机存储文件
     private boolean havePermission = false;//判断权限
     private EditText editTextCourseName;//课程名称修改框
@@ -63,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private LinearLayout popLinearLayout;//“修改”弹窗动态线性布局
     private PopupWindow popupWindow;//“修改”弹框
     private SwipeRefreshLayout swipeRefreshLayout;//下拉刷新
-    private int[][] courseLength = new int[7][10];//课程长度
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         _256dp = (int) getResources().getDimension(R.dimen._256dp);
         /*权限 ->*/
         if (ContextCompat.checkSelfPermission(MainActivity.this, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{WRITE_EXTERNAL_STORAGE}, Permission_WRITE_EXTERNAL_STORAGE);
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{WRITE_EXTERNAL_STORAGE}, PERMISSION_WRITE_EXTERNAL_STORAGE);
         } else {
             havePermission = true;
         }/*<- 权限*/
@@ -102,15 +102,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }/*<- 文件读写*/
         addJson();//将JSON中的null填充
         getCourseArray();//获取课表数据
-        //addButton();//添加Button
-        for (int i = 0; i < 7; i++)//初始化课表长度
-            for (int j = 0; j < 10; j++)
-                courseLength[i][j] = 1;
         setCourseLength();//设置课程长度
-        addLongCourse();
+        addLongCourse();//添加长Button
         initPopupWindow();//添加PopupWindow控件
         initRefresh();//添加下拉刷新
-
     }
 
     @Override/*按钮点击事件*/
@@ -139,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override/*权限回调方法*/
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == Permission_WRITE_EXTERNAL_STORAGE) {
+        if (requestCode == PERMISSION_WRITE_EXTERNAL_STORAGE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
             } else {
@@ -166,7 +161,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         spaceLayoutParams.setMargins(_2dp, (int) getResources().getDimension(R.dimen._12dp), 0, 0);//设置边距
         for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 10; j++) {
-                /*Button*/
                 button[i][j] = new Button(this);
                 button[i][j].setLayoutParams(layoutParams);//设置Button大小
                 button[i][j].setTextAppearance(getApplicationContext(), R.style.Widget_AppCompat_Button_Borderless);
@@ -295,10 +289,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             fileOutputStream.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            Toast.makeText(getApplicationContext(), "异常位置：void saveData()\n异常类型：FileNotFoundException", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "saveData()\n"+e.toString(), Toast.LENGTH_LONG).show();
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(getApplicationContext(), "异常位置：void saveData()\n异常类型：IOException", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "saveData()\n"+e.toString(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -310,7 +304,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String text = buffer.readLine();//读取文件
             return text;
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "异常位置：String getJsonStringFromMemory()/n异常类型：读取缓存数据失败", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "getJsonStringFromMemory()/n"+e.toString(), Toast.LENGTH_SHORT).show();
         }
         return "";
     }
@@ -410,17 +404,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 default:
             }
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "异常位置：void setJson(...)\n异常类型：引用null", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "setJson(...)\n"+e.toString(), Toast.LENGTH_LONG).show();
         }
     }
 
     /*将JSON中的null填充*/
     private void addJson() {
-        int i;
         Gson gson = new Gson();
         Course course = gson.fromJson(JsonString, Course.class);
         try {
-            for (i = 0; i < 10; i++) {
+            for (int i = 0; i < 10; i++) {
                 if (course.getMondayCourse() != null) {
                     if (course.getMondayCourse().get(i) == null) {
                         course.getMondayCourse().set(i, new Course.DayCourse("", "", "", ""));
@@ -478,7 +471,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             JsonString = gson.toJson(course);
             saveData();
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "异常位置：void getCourseArray()\n异常类型：Exception", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "void getCourseArray()\n"+e.toString(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -525,7 +518,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         popupWindow.setContentView(popLinearLayout);
         popupWindow.setFocusable(true); // 设置PopupWindow可获得焦点
         popupWindow.setWidth(_256dp);
-//        popupWindow.setHeight(_256dp);
         /*<- PopWindow*/
     }
 
@@ -540,14 +532,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
                     dialog.setCancelable(true);
                     dialog.setTitle("说明：");
-                    dialog.setMessage("* 初始化将会清除本地的课程表数据\n    （包含自定义编辑的内容)\n* 编辑内容将于重启后生效\n    编辑模式下长按可进行修改");
-                    dialog.setNegativeButton("初始化", new DialogInterface.OnClickListener() {
+                    dialog.setMessage("* 编辑内容将于重启后生效\n    编辑模式下长按可进行修改");
+                    dialog.setNegativeButton("刷新", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             freeButton();
-                            JsonString = getLocalJson("coursetable_json.txt");
-                            addJson();
+                            if (file.exists() && havePermission) {
+                                JsonString = getJsonStringFromMemory();
+                            } else {
+                                JsonString = getLocalJson("coursetable_json.txt");
+                            }
                             getCourseArray();
+                            setCourseLength();
                             addLongCourse();
                             swipeRefreshLayout.setRefreshing(false);
                         }
@@ -585,8 +581,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /*设置课程长度*/
     private void setCourseLength() {
-        Gson gson = new Gson();
-        Course course = gson.fromJson(JsonString, Course.class);
+        for (int i = 0; i < 7; i++)//初始化课表长度
+            for (int j = 0; j < 10; j++)
+                courseLength[i][j] = 1;
         for (int i = 0; i < 7; i++) {
             for (int j = 8; j >= 0; j--) {
                 if (!courseNameArray[i][j].equals("")) {//禁止比较空格
@@ -594,8 +591,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if (courseNameArray[i][j].equals(courseNameArray[i][j + 1])) {//连接同名课程
                             courseLength[i][j] = courseLength[i][j + 1] + 1;
                             courseLength[i][j + 1] = courseLength[i][j + 1] - courseLength[i][j + 1];
-                            setJson(course, i, j + 1, "", "", "", "");
-                            JsonString = gson.toJson(course);
                             getCourseArray();
                         }
                     }
@@ -606,27 +601,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /*添加长按钮*/
     private void addLongCourse() {
+        LinearLayout.LayoutParams longCourseLayoutParams;//课程按钮布局
+        LinearLayout.LayoutParams longCourseSpaceLayoutParams;//带空隙课程布局
         for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 10; j++) {
                 button[i][j] = new Button(this);
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                longCourseLayoutParams = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT, courseLength[i][j] * _58dp);//布局参数
-                layoutParams.setMargins(_2dp, (int) getResources().getDimension(R.dimen._2dp), 0, 0);//设置边距
-                LinearLayout.LayoutParams spaceLayoutParams = new LinearLayout.LayoutParams(
+                longCourseLayoutParams.setMargins(_2dp, (int) getResources().getDimension(R.dimen._2dp), 0, 0);//设置边距
+                longCourseSpaceLayoutParams = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT, courseLength[i][j] * _58dp);//布局参数
-                spaceLayoutParams.setMargins(_2dp, (int) getResources().getDimension(R.dimen._12dp), 0, 0);//设置边距
-                button[i][j].setLayoutParams(layoutParams);//设置Button大小
-                button[i][j].setTextAppearance(getApplicationContext(), R.style.Widget_AppCompat_Button_Borderless);
+                longCourseSpaceLayoutParams.setMargins(_2dp, (int) getResources().getDimension(R.dimen._12dp), 0, 0);//设置边距
+                button[i][j].setLayoutParams(longCourseLayoutParams);//设置Button大小
+                button[i][j].setTextAppearance(getApplicationContext(), R.style.Widget_AppCompat_Button_Borderless);//主题？未生效
                 button[i][j].setTag(new ButtonPosition(i, j));//设置坐标
                 button[i][j].setTextColor(Color.parseColor("#ffffff"));//设置文字颜色
                 button[i][j].setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11);//设置文字大小
                 button[i][j].setText(courseNameArray[i][j] + "\n" + coursePlaceArray[i][j] + "\n" + courseTeacherArray[i][j]);//设置文字
-                button[i][j].setBackground(getDrawable(R.drawable.button0));
                 if (j == 4 || j == 8) {//设置分割线
-                    button[i][j].setLayoutParams(spaceLayoutParams);
+                    button[i][j].setLayoutParams(longCourseSpaceLayoutParams);
                 }
-                setButtonBackgroundColor(i, j);
-                if (button[i][j].getText().charAt(0) == '\n' || button[i][j].getText().equals("")) {
+                setButtonBackgroundColor(i, j);//设置背景
+                if (button[i][j].getText().charAt(0) == '\n' || button[i][j].getText().equals("")) {//隐藏空Button
                     button[i][j].setBackgroundColor(Color.parseColor("#00000000"));
                 }
                 day[i].addView(button[i][j]);
