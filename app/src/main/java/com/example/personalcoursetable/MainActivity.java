@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Random;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
@@ -175,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 button[i][j].setOnClickListener(this);//Button点击事件
                 button[i][j].setOnLongClickListener(this);
-                setButtonBackgroundColor(i, j);
+                setButtonBackgroundColor(i,j);
                 if (button[i][j].getText().equals("")) {//隐藏无内容Button
                     button[i][j].setBackgroundColor(Color.parseColor("#00000000"));
                 }
@@ -223,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             JsonString = buffer.toString();
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "异常位置：String getLocalJson(String filename)/n异常类型：Exception", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "getLocalJson(...)"+e.toString(), Toast.LENGTH_LONG).show();
         }
         return JsonString;
     }
@@ -279,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "异常位置：void getCourseArray()\n异常类型：Exception", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "getCourseArray()\n"+e.toString(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -534,7 +536,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
                     dialog.setCancelable(true);
                     dialog.setTitle("说明：");
-                    dialog.setMessage("* 编辑内容将于重启后生效\n    编辑模式下长按可进行修改");
+                    dialog.setMessage("* 编辑模式下长按可进行修改\n* 同名课程取首节课的课程信息");
                     dialog.setNegativeButton("刷新", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -628,7 +630,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 button[i][j].setTextColor(Color.parseColor("#ffffff"));//设置文字颜色
                 button[i][j].setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11);//设置文字大小
                 button[i][j].setText(courseNameArray[i][j] + "\n" + coursePlaceArray[i][j] + "\n" + courseTeacherArray[i][j]);//设置文字
-                setButtonBackgroundColor(i, j);//设置背景
+                setButtonBackgroundColor(i,j);//设置背景
                 if (button[i][j].getText().charAt(0) == '\n' || button[i][j].getText().equals("")) {//隐藏空Button
                     button[i][j].setBackgroundColor(Color.parseColor("#00000000"));
                 }
@@ -638,64 +640,77 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /*添加按钮背景色*/
-    private void setButtonBackgroundColor(int i, int j) {
+    private void setButtonBackgroundColor(int i,int j) {
         if (i == 0) {//向布局中添加Button并设置Button背景
             if (j < 4) {
                 button[i][j].setBackground(getDrawable(R.drawable.button0));
             } else if (j >= 4 && j < 8) {
-                button[i][j].setBackground(getDrawable(R.drawable.button1));
-            } else {
                 button[i][j].setBackground(getDrawable(R.drawable.button2));
+            } else {
+                button[i][j].setBackground(getDrawable(R.drawable.button4));
             }
         } else if (i == 1) {
             if (j < 4) {
                 button[i][j].setBackground(getDrawable(R.drawable.button1));
             } else if (j >= 4 && j < 8) {
-                button[i][j].setBackground(getDrawable(R.drawable.button2));
-            } else {
                 button[i][j].setBackground(getDrawable(R.drawable.button3));
+            } else {
+                button[i][j].setBackground(getDrawable(R.drawable.button5));
             }
         } else if (i == 2) {
             if (j < 4) {
                 button[i][j].setBackground(getDrawable(R.drawable.button2));
             } else if (j >= 4 && j < 8) {
-                button[i][j].setBackground(getDrawable(R.drawable.button3));
-            } else {
                 button[i][j].setBackground(getDrawable(R.drawable.button4));
+            } else {
+                button[i][j].setBackground(getDrawable(R.drawable.button6));
             }
         } else if (i == 3) {
             if (j < 4) {
                 button[i][j].setBackground(getDrawable(R.drawable.button3));
             } else if (j >= 4 && j < 8) {
-                button[i][j].setBackground(getDrawable(R.drawable.button4));
-            } else {
                 button[i][j].setBackground(getDrawable(R.drawable.button5));
+            } else {
+                button[i][j].setBackground(getDrawable(R.drawable.button0));
             }
         } else if (i == 4) {
             if (j < 4) {
                 button[i][j].setBackground(getDrawable(R.drawable.button4));
             } else if (j >= 4 && j < 8) {
-                button[i][j].setBackground(getDrawable(R.drawable.button5));
-            } else {
                 button[i][j].setBackground(getDrawable(R.drawable.button6));
+            } else {
+                button[i][j].setBackground(getDrawable(R.drawable.button1));
             }
         } else if (i == 5) {
             if (j < 4) {
                 button[i][j].setBackground(getDrawable(R.drawable.button5));
             } else if (j >= 4 && j < 8) {
-                button[i][j].setBackground(getDrawable(R.drawable.button6));
-            } else {
                 button[i][j].setBackground(getDrawable(R.drawable.button0));
+            } else {
+                button[i][j].setBackground(getDrawable(R.drawable.button2));
             }
         } else if (i == 6) {
             if (j < 4) {
                 button[i][j].setBackground(getDrawable(R.drawable.button6));
             } else if (j >= 4 && j < 8) {
-                button[i][j].setBackground(getDrawable(R.drawable.button0));
-            } else {
                 button[i][j].setBackground(getDrawable(R.drawable.button1));
+            } else {
+                button[i][j].setBackground(getDrawable(R.drawable.button3));
             }
         }
+        /* 随机色
+        Drawable[] drawable=new Drawable[7];
+        drawable[0]=getDrawable(R.drawable.button0);
+        drawable[1]=getDrawable(R.drawable.button1);
+        drawable[2]=getDrawable(R.drawable.button2);
+        drawable[3]=getDrawable(R.drawable.button3);
+        drawable[4]=getDrawable(R.drawable.button4);
+        drawable[5]=getDrawable(R.drawable.button5);
+        drawable[6]=getDrawable(R.drawable.button6);
+        Random random = new Random();
+        int r=random.nextInt(6);
+        button[i][j].setBackgroundDrawable(drawable[r]);
+        太丑了 */
     }
 
     /*释放Button空间，清空屏幕*/
