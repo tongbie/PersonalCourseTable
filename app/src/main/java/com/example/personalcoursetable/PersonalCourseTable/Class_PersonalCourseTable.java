@@ -1,11 +1,10 @@
-package com.example.personalcoursetable;
+package com.example.personalcoursetable.PersonalCourseTable;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -25,7 +24,7 @@ import android.widget.PopupWindow;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
-import com.example.personalcoursetable.Gson.Course;
+import com.example.personalcoursetable.R;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
@@ -37,11 +36,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Random;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener {
+public class Class_PersonalCourseTable extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener {
     private Button button[][] = new Button[7][10];//Button数组
     private LinearLayout.LayoutParams layoutParams;//布局参数
     private int _2dp;//相邻Button间隔
@@ -71,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.personalcoursetable_activity);
         Window window = getWindow();
         window.setStatusBarColor(Color.parseColor("#7ebeab"));//设置状态栏颜色
         day[0] = (LinearLayout) findViewById(R.id.day0);
@@ -86,8 +84,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         _2dp = (int) getResources().getDimension(R.dimen._2dp);//相邻Button间隔
         _256dp = (int) getResources().getDimension(R.dimen._256dp);
         /*权限 ->*/
-        if (ContextCompat.checkSelfPermission(MainActivity.this, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{WRITE_EXTERNAL_STORAGE}, PERMISSION_WRITE_EXTERNAL_STORAGE);
+        if (ContextCompat.checkSelfPermission(Class_PersonalCourseTable.this, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(Class_PersonalCourseTable.this, new String[]{WRITE_EXTERNAL_STORAGE}, PERMISSION_WRITE_EXTERNAL_STORAGE);
         } else {
             havePermission = true;
         }/*<- 权限*/
@@ -118,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ButtonPosition buttonPosition = (ButtonPosition) onClickButton.getTag();
         int X = buttonPosition.x, Y = buttonPosition.y;
         if (!button[X][Y].getText().equals("")) {
-            AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+            AlertDialog.Builder dialog = new AlertDialog.Builder(Class_PersonalCourseTable.this);
             dialog.setTitle(courseNameArray[X][Y]);
             dialog.setMessage("课程时间：" + courseWeekArray[X][Y] + "\n上课地点：" + coursePlaceArray[X][Y] + "\n任课教师：" + courseTeacherArray[X][Y]);
             dialog.setCancelable(true);
@@ -234,50 +232,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void getCourseArray() {
         int i;
         Gson gson = new Gson();
-        Course course = gson.fromJson(JsonString, Course.class);
+        Gson_PersonalCourseTable gsonPersonalCourseTable = gson.fromJson(JsonString, Gson_PersonalCourseTable.class);
         try {
             for (i = 0; i < 10; i++) {
-                if (course.getMondayCourse() != null) {
-                    courseNameArray[0][i] = course.getMondayCourse().get(i).getCourseName();
-                    courseWeekArray[0][i] = course.getMondayCourse().get(i).getCourseWeek();
-                    coursePlaceArray[0][i] = course.getMondayCourse().get(i).getCoursePlace();
-                    courseTeacherArray[0][i] = course.getMondayCourse().get(i).getCourseTeacher();
+                if (gsonPersonalCourseTable.getMondayCourse() != null) {
+                    courseNameArray[0][i] = gsonPersonalCourseTable.getMondayCourse().get(i).getCourseName();
+                    courseWeekArray[0][i] = gsonPersonalCourseTable.getMondayCourse().get(i).getCourseWeek();
+                    coursePlaceArray[0][i] = gsonPersonalCourseTable.getMondayCourse().get(i).getCoursePlace();
+                    courseTeacherArray[0][i] = gsonPersonalCourseTable.getMondayCourse().get(i).getCourseTeacher();
                 }
-                if (course.getTuesdayCourse() != null) {
-                    courseNameArray[1][i] = course.getTuesdayCourse().get(i).getCourseName();
-                    courseWeekArray[1][i] = course.getTuesdayCourse().get(i).getCourseWeek();
-                    coursePlaceArray[1][i] = course.getTuesdayCourse().get(i).getCoursePlace();
-                    courseTeacherArray[1][i] = course.getTuesdayCourse().get(i).getCourseTeacher();
+                if (gsonPersonalCourseTable.getTuesdayCourse() != null) {
+                    courseNameArray[1][i] = gsonPersonalCourseTable.getTuesdayCourse().get(i).getCourseName();
+                    courseWeekArray[1][i] = gsonPersonalCourseTable.getTuesdayCourse().get(i).getCourseWeek();
+                    coursePlaceArray[1][i] = gsonPersonalCourseTable.getTuesdayCourse().get(i).getCoursePlace();
+                    courseTeacherArray[1][i] = gsonPersonalCourseTable.getTuesdayCourse().get(i).getCourseTeacher();
                 }
-                if (course.getWednesdayCourse() != null) {
-                    courseNameArray[2][i] = course.getWednesdayCourse().get(i).getCourseName();
-                    courseWeekArray[2][i] = course.getWednesdayCourse().get(i).getCourseWeek();
-                    coursePlaceArray[2][i] = course.getWednesdayCourse().get(i).getCoursePlace();
-                    courseTeacherArray[2][i] = course.getWednesdayCourse().get(i).getCourseTeacher();
+                if (gsonPersonalCourseTable.getWednesdayCourse() != null) {
+                    courseNameArray[2][i] = gsonPersonalCourseTable.getWednesdayCourse().get(i).getCourseName();
+                    courseWeekArray[2][i] = gsonPersonalCourseTable.getWednesdayCourse().get(i).getCourseWeek();
+                    coursePlaceArray[2][i] = gsonPersonalCourseTable.getWednesdayCourse().get(i).getCoursePlace();
+                    courseTeacherArray[2][i] = gsonPersonalCourseTable.getWednesdayCourse().get(i).getCourseTeacher();
                 }
-                if (course.getTuesdayCourse() != null) {
-                    courseNameArray[3][i] = course.getThursdayCourse().get(i).getCourseName();
-                    courseWeekArray[3][i] = course.getThursdayCourse().get(i).getCourseWeek();
-                    coursePlaceArray[3][i] = course.getThursdayCourse().get(i).getCoursePlace();
-                    courseTeacherArray[3][i] = course.getThursdayCourse().get(i).getCourseTeacher();
+                if (gsonPersonalCourseTable.getTuesdayCourse() != null) {
+                    courseNameArray[3][i] = gsonPersonalCourseTable.getThursdayCourse().get(i).getCourseName();
+                    courseWeekArray[3][i] = gsonPersonalCourseTable.getThursdayCourse().get(i).getCourseWeek();
+                    coursePlaceArray[3][i] = gsonPersonalCourseTable.getThursdayCourse().get(i).getCoursePlace();
+                    courseTeacherArray[3][i] = gsonPersonalCourseTable.getThursdayCourse().get(i).getCourseTeacher();
                 }
-                if (course.getFridayCourse() != null) {
-                    courseNameArray[4][i] = course.getFridayCourse().get(i).getCourseName();
-                    courseWeekArray[4][i] = course.getFridayCourse().get(i).getCourseWeek();
-                    coursePlaceArray[4][i] = course.getFridayCourse().get(i).getCoursePlace();
-                    courseTeacherArray[4][i] = course.getFridayCourse().get(i).getCourseTeacher();
+                if (gsonPersonalCourseTable.getFridayCourse() != null) {
+                    courseNameArray[4][i] = gsonPersonalCourseTable.getFridayCourse().get(i).getCourseName();
+                    courseWeekArray[4][i] = gsonPersonalCourseTable.getFridayCourse().get(i).getCourseWeek();
+                    coursePlaceArray[4][i] = gsonPersonalCourseTable.getFridayCourse().get(i).getCoursePlace();
+                    courseTeacherArray[4][i] = gsonPersonalCourseTable.getFridayCourse().get(i).getCourseTeacher();
                 }
-                if (course.getSaturdayCourse() != null) {
-                    courseNameArray[5][i] = course.getSaturdayCourse().get(i).getCourseName();
-                    courseWeekArray[5][i] = course.getSaturdayCourse().get(i).getCourseWeek();
-                    coursePlaceArray[5][i] = course.getSaturdayCourse().get(i).getCoursePlace();
-                    courseTeacherArray[5][i] = course.getSaturdayCourse().get(i).getCourseTeacher();
+                if (gsonPersonalCourseTable.getSaturdayCourse() != null) {
+                    courseNameArray[5][i] = gsonPersonalCourseTable.getSaturdayCourse().get(i).getCourseName();
+                    courseWeekArray[5][i] = gsonPersonalCourseTable.getSaturdayCourse().get(i).getCourseWeek();
+                    coursePlaceArray[5][i] = gsonPersonalCourseTable.getSaturdayCourse().get(i).getCoursePlace();
+                    courseTeacherArray[5][i] = gsonPersonalCourseTable.getSaturdayCourse().get(i).getCourseTeacher();
                 }
-                if (course.getSundayCourse() != null) {
-                    courseNameArray[6][i] = course.getSundayCourse().get(i).getCourseName();
-                    courseWeekArray[6][i] = course.getSundayCourse().get(i).getCourseWeek();
-                    coursePlaceArray[6][i] = course.getSundayCourse().get(i).getCoursePlace();
-                    courseTeacherArray[6][i] = course.getSundayCourse().get(i).getCourseTeacher();
+                if (gsonPersonalCourseTable.getSundayCourse() != null) {
+                    courseNameArray[6][i] = gsonPersonalCourseTable.getSundayCourse().get(i).getCourseName();
+                    courseWeekArray[6][i] = gsonPersonalCourseTable.getSundayCourse().get(i).getCourseWeek();
+                    coursePlaceArray[6][i] = gsonPersonalCourseTable.getSundayCourse().get(i).getCoursePlace();
+                    courseTeacherArray[6][i] = gsonPersonalCourseTable.getSundayCourse().get(i).getCourseTeacher();
                 }
             }
         } catch (Exception e) {
@@ -316,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /*修改JSON文件*/
     private void reviseJson(final int X, final int Y) {
         final Gson gson = new Gson();
-        final Course course = gson.fromJson(JsonString, Course.class);
+        final Gson_PersonalCourseTable gsonPersonalCourseTable = gson.fromJson(JsonString, Gson_PersonalCourseTable.class);
         editTextCourseName.setText(courseNameArray[X][Y]);//显示课程名称
         editTextCourseName.setHint("课程名称：");//显示提示文字
         editTextCourseWeek.setText(courseWeekArray[X][Y]);//显示课程时间
@@ -329,8 +327,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         popupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setJson(course, X, Y, editTextCourseName.getText().toString(), editTextCourseWeek.getText().toString(), editTextCoursePlace.getText().toString(), editTextCourseTeacher.getText().toString());
-                JsonString = gson.toJson(course);
+                setJson(gsonPersonalCourseTable, X, Y, editTextCourseName.getText().toString(), editTextCourseWeek.getText().toString(), editTextCoursePlace.getText().toString(), editTextCourseTeacher.getText().toString());
+                JsonString = gson.toJson(gsonPersonalCourseTable);
                 saveData();
                 courseNameArray[X][Y] = editTextCourseName.getText().toString();
                 courseWeekArray[X][Y] = editTextCourseWeek.getText().toString();
@@ -353,57 +351,57 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button[X][Y].setBackgroundColor(Color.parseColor("#00000000"));
         button[X][Y].setText("");
         Gson gson = new Gson();
-        Course course = gson.fromJson(JsonString, Course.class);
-        setJson(course, X, Y, "", "", "", "");
-        JsonString = gson.toJson(course);
+        Gson_PersonalCourseTable gsonPersonalCourseTable = gson.fromJson(JsonString, Gson_PersonalCourseTable.class);
+        setJson(gsonPersonalCourseTable, X, Y, "", "", "", "");
+        JsonString = gson.toJson(gsonPersonalCourseTable);
         saveData();
     }
 
     /*修改和删除JSON文件的中间方法*/
-    private void setJson(Course course, int X, int Y, String courseName, String courseWeek, String coursePlace, String courseTeacher) {
+    private void setJson(Gson_PersonalCourseTable gsonPersonalCourseTable, int X, int Y, String courseName, String courseWeek, String coursePlace, String courseTeacher) {
         try {
             switch (X) {
                 case 0:
-                    course.getMondayCourse().get(Y).setCourseName(courseName);
-                    course.getMondayCourse().get(Y).setCoursePlace(coursePlace);
-                    course.getMondayCourse().get(Y).setCourseTeacher(courseTeacher);
-                    course.getMondayCourse().get(Y).setCourseWeek(courseWeek);
+                    gsonPersonalCourseTable.getMondayCourse().get(Y).setCourseName(courseName);
+                    gsonPersonalCourseTable.getMondayCourse().get(Y).setCoursePlace(coursePlace);
+                    gsonPersonalCourseTable.getMondayCourse().get(Y).setCourseTeacher(courseTeacher);
+                    gsonPersonalCourseTable.getMondayCourse().get(Y).setCourseWeek(courseWeek);
                     break;
                 case 1:
-                    course.getTuesdayCourse().get(Y).setCourseName(courseName);
-                    course.getTuesdayCourse().get(Y).setCoursePlace(coursePlace);
-                    course.getTuesdayCourse().get(Y).setCourseTeacher(courseTeacher);
-                    course.getTuesdayCourse().get(Y).setCourseWeek(courseWeek);
+                    gsonPersonalCourseTable.getTuesdayCourse().get(Y).setCourseName(courseName);
+                    gsonPersonalCourseTable.getTuesdayCourse().get(Y).setCoursePlace(coursePlace);
+                    gsonPersonalCourseTable.getTuesdayCourse().get(Y).setCourseTeacher(courseTeacher);
+                    gsonPersonalCourseTable.getTuesdayCourse().get(Y).setCourseWeek(courseWeek);
                     break;
                 case 2:
-                    course.getWednesdayCourse().get(Y).setCourseName(courseName);
-                    course.getWednesdayCourse().get(Y).setCoursePlace(coursePlace);
-                    course.getWednesdayCourse().get(Y).setCourseTeacher(courseTeacher);
-                    course.getWednesdayCourse().get(Y).setCourseWeek(courseWeek);
+                    gsonPersonalCourseTable.getWednesdayCourse().get(Y).setCourseName(courseName);
+                    gsonPersonalCourseTable.getWednesdayCourse().get(Y).setCoursePlace(coursePlace);
+                    gsonPersonalCourseTable.getWednesdayCourse().get(Y).setCourseTeacher(courseTeacher);
+                    gsonPersonalCourseTable.getWednesdayCourse().get(Y).setCourseWeek(courseWeek);
                     break;
                 case 3:
-                    course.getThursdayCourse().get(Y).setCourseName(courseName);
-                    course.getThursdayCourse().get(Y).setCoursePlace(coursePlace);
-                    course.getThursdayCourse().get(Y).setCourseTeacher(courseTeacher);
-                    course.getThursdayCourse().get(Y).setCourseWeek(courseWeek);
+                    gsonPersonalCourseTable.getThursdayCourse().get(Y).setCourseName(courseName);
+                    gsonPersonalCourseTable.getThursdayCourse().get(Y).setCoursePlace(coursePlace);
+                    gsonPersonalCourseTable.getThursdayCourse().get(Y).setCourseTeacher(courseTeacher);
+                    gsonPersonalCourseTable.getThursdayCourse().get(Y).setCourseWeek(courseWeek);
                     break;
                 case 4:
-                    course.getFridayCourse().get(Y).setCourseName(courseName);
-                    course.getFridayCourse().get(Y).setCoursePlace(coursePlace);
-                    course.getFridayCourse().get(Y).setCourseTeacher(courseTeacher);
-                    course.getFridayCourse().get(Y).setCourseWeek(courseWeek);
+                    gsonPersonalCourseTable.getFridayCourse().get(Y).setCourseName(courseName);
+                    gsonPersonalCourseTable.getFridayCourse().get(Y).setCoursePlace(coursePlace);
+                    gsonPersonalCourseTable.getFridayCourse().get(Y).setCourseTeacher(courseTeacher);
+                    gsonPersonalCourseTable.getFridayCourse().get(Y).setCourseWeek(courseWeek);
                     break;
                 case 5:
-                    course.getSaturdayCourse().get(Y).setCourseName(courseName);
-                    course.getSaturdayCourse().get(Y).setCoursePlace(coursePlace);
-                    course.getSaturdayCourse().get(Y).setCourseTeacher(courseTeacher);
-                    course.getSaturdayCourse().get(Y).setCourseWeek(courseWeek);
+                    gsonPersonalCourseTable.getSaturdayCourse().get(Y).setCourseName(courseName);
+                    gsonPersonalCourseTable.getSaturdayCourse().get(Y).setCoursePlace(coursePlace);
+                    gsonPersonalCourseTable.getSaturdayCourse().get(Y).setCourseTeacher(courseTeacher);
+                    gsonPersonalCourseTable.getSaturdayCourse().get(Y).setCourseWeek(courseWeek);
                     break;
                 case 6:
-                    course.getSundayCourse().get(Y).setCourseName(courseName);
-                    course.getSundayCourse().get(Y).setCoursePlace(coursePlace);
-                    course.getSundayCourse().get(Y).setCourseTeacher(courseTeacher);
-                    course.getSundayCourse().get(Y).setCourseWeek(courseWeek);
+                    gsonPersonalCourseTable.getSundayCourse().get(Y).setCourseName(courseName);
+                    gsonPersonalCourseTable.getSundayCourse().get(Y).setCoursePlace(coursePlace);
+                    gsonPersonalCourseTable.getSundayCourse().get(Y).setCourseTeacher(courseTeacher);
+                    gsonPersonalCourseTable.getSundayCourse().get(Y).setCourseWeek(courseWeek);
                     break;
                 default:
             }
@@ -415,64 +413,64 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /*将JSON中的null填充*/
     private void addJson() {
         Gson gson = new Gson();
-        Course course = gson.fromJson(JsonString, Course.class);
+        Gson_PersonalCourseTable gsonPersonalCourseTable = gson.fromJson(JsonString, Gson_PersonalCourseTable.class);
         try {
             for (int i = 0; i < 10; i++) {
-                if (course.getMondayCourse() != null) {
-                    if (course.getMondayCourse().get(i) == null) {
-                        course.getMondayCourse().set(i, new Course.DayCourse("", "", "", ""));
+                if (gsonPersonalCourseTable.getMondayCourse() != null) {
+                    if (gsonPersonalCourseTable.getMondayCourse().get(i) == null) {
+                        gsonPersonalCourseTable.getMondayCourse().set(i, new Gson_PersonalCourseTable.DayCourse("", "", "", ""));
                     }
                 } else {
-                    course.setMondayCourse(addArrayList());
+                    gsonPersonalCourseTable.setMondayCourse(addArrayList());
                 }
-                if (course.getTuesdayCourse() != null) {
-                    if (course.getTuesdayCourse().get(i) == null) {
-                        course.getTuesdayCourse().set(i, new Course.DayCourse("", "", "", ""));
+                if (gsonPersonalCourseTable.getTuesdayCourse() != null) {
+                    if (gsonPersonalCourseTable.getTuesdayCourse().get(i) == null) {
+                        gsonPersonalCourseTable.getTuesdayCourse().set(i, new Gson_PersonalCourseTable.DayCourse("", "", "", ""));
                     }
                 } else {
-                    course.setTuesdayCourse(addArrayList());
+                    gsonPersonalCourseTable.setTuesdayCourse(addArrayList());
                 }
-                if (course.getWednesdayCourse() != null) {
-                    if (course.getWednesdayCourse().get(i) == null) {
-                        course.getWednesdayCourse().set(i, new Course.DayCourse("", "", "", ""));
+                if (gsonPersonalCourseTable.getWednesdayCourse() != null) {
+                    if (gsonPersonalCourseTable.getWednesdayCourse().get(i) == null) {
+                        gsonPersonalCourseTable.getWednesdayCourse().set(i, new Gson_PersonalCourseTable.DayCourse("", "", "", ""));
                     }
                 } else {
-                    course.setWednesdayCourse(addArrayList());
+                    gsonPersonalCourseTable.setWednesdayCourse(addArrayList());
                 }
-                if (course.getThursdayCourse() != null) {
-                    if (course.getThursdayCourse().get(i) == null) {
-                        course.getThursdayCourse().set(i, new Course.DayCourse("", "", "", ""));
+                if (gsonPersonalCourseTable.getThursdayCourse() != null) {
+                    if (gsonPersonalCourseTable.getThursdayCourse().get(i) == null) {
+                        gsonPersonalCourseTable.getThursdayCourse().set(i, new Gson_PersonalCourseTable.DayCourse("", "", "", ""));
                     }
                 } else {
-                    course.setThursdayCourse(addArrayList());
+                    gsonPersonalCourseTable.setThursdayCourse(addArrayList());
                 }
-                if (course.getFridayCourse() != null) {
-                    if (course.getFridayCourse().get(i) == null) {
-                        course.getFridayCourse().set(i, new Course.DayCourse("", "", "", ""));
+                if (gsonPersonalCourseTable.getFridayCourse() != null) {
+                    if (gsonPersonalCourseTable.getFridayCourse().get(i) == null) {
+                        gsonPersonalCourseTable.getFridayCourse().set(i, new Gson_PersonalCourseTable.DayCourse("", "", "", ""));
                     }
                 } else {
-                    course.setFridayCourse(addArrayList());
+                    gsonPersonalCourseTable.setFridayCourse(addArrayList());
                 }
-                if (course.getSaturdayCourse() != null) {
-                    if (course.getSaturdayCourse().get(i) == null) {
-                        course.getSaturdayCourse().set(i, new Course.DayCourse("", "", "", ""));
+                if (gsonPersonalCourseTable.getSaturdayCourse() != null) {
+                    if (gsonPersonalCourseTable.getSaturdayCourse().get(i) == null) {
+                        gsonPersonalCourseTable.getSaturdayCourse().set(i, new Gson_PersonalCourseTable.DayCourse("", "", "", ""));
                     }
                 } else {
-                    course.setSaturdayCourse(addArrayList());
+                    gsonPersonalCourseTable.setSaturdayCourse(addArrayList());
                 }
-                if (course.getSundayCourse() != null) {
-                    if (course.getSundayCourse().get(i) == null) {
-                        course.getSundayCourse().set(i, new Course.DayCourse("", "", "", ""));
+                if (gsonPersonalCourseTable.getSundayCourse() != null) {
+                    if (gsonPersonalCourseTable.getSundayCourse().get(i) == null) {
+                        gsonPersonalCourseTable.getSundayCourse().set(i, new Gson_PersonalCourseTable.DayCourse("", "", "", ""));
                     }
                 } else {
-                    ArrayList<Course.DayCourse> arrayList = new ArrayList<Course.DayCourse>();
+                    ArrayList<Gson_PersonalCourseTable.DayCourse> arrayList = new ArrayList<Gson_PersonalCourseTable.DayCourse>();
                     for (int j = 0; j < 10; j++) {
-                        arrayList.add(new Course.DayCourse("", "", "", ""));
+                        arrayList.add(new Gson_PersonalCourseTable.DayCourse("", "", "", ""));
                     }
-                    course.setSundayCourse(addArrayList());
+                    gsonPersonalCourseTable.setSundayCourse(addArrayList());
                 }
             }
-            JsonString = gson.toJson(course);
+            JsonString = gson.toJson(gsonPersonalCourseTable);
             saveData();
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "void getCourseArray()\n" + e.toString(), Toast.LENGTH_LONG).show();
@@ -480,10 +478,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /*addJson()中间方法，填充一天的数据*/
-    private ArrayList<Course.DayCourse> addArrayList() {
-        ArrayList<Course.DayCourse> arrayList = new ArrayList<Course.DayCourse>();
+    private ArrayList<Gson_PersonalCourseTable.DayCourse> addArrayList() {
+        ArrayList<Gson_PersonalCourseTable.DayCourse> arrayList = new ArrayList<Gson_PersonalCourseTable.DayCourse>();
         for (int j = 0; j < 10; j++) {
-            arrayList.add(new Course.DayCourse("", "", "", ""));
+            arrayList.add(new Gson_PersonalCourseTable.DayCourse("", "", "", ""));
         }
         return arrayList;
     }
@@ -533,7 +531,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onRefresh() {
                 if (swipeRefreshLayout.getVerticalScrollbarPosition() == 0) {//判断页面是否在最上方
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(Class_PersonalCourseTable.this);
                     dialog.setCancelable(true);
                     dialog.setTitle("说明：");
                     dialog.setMessage("* 编辑模式下长按可进行修改\n* 同名课程取首节课的课程信息");
@@ -645,57 +643,57 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (j < 4) {
                 button[i][j].setBackground(getDrawable(R.drawable.button0));
             } else if (j >= 4 && j < 8) {
-                button[i][j].setBackground(getDrawable(R.drawable.button2));
+                button[i][j].setBackground(getDrawable(R.drawable.button1));
             } else {
-                button[i][j].setBackground(getDrawable(R.drawable.button4));
+                button[i][j].setBackground(getDrawable(R.drawable.button2));
             }
         } else if (i == 1) {
             if (j < 4) {
                 button[i][j].setBackground(getDrawable(R.drawable.button1));
             } else if (j >= 4 && j < 8) {
-                button[i][j].setBackground(getDrawable(R.drawable.button3));
+                button[i][j].setBackground(getDrawable(R.drawable.button2));
             } else {
-                button[i][j].setBackground(getDrawable(R.drawable.button5));
+                button[i][j].setBackground(getDrawable(R.drawable.button3));
             }
         } else if (i == 2) {
             if (j < 4) {
                 button[i][j].setBackground(getDrawable(R.drawable.button2));
             } else if (j >= 4 && j < 8) {
-                button[i][j].setBackground(getDrawable(R.drawable.button4));
+                button[i][j].setBackground(getDrawable(R.drawable.button3));
             } else {
-                button[i][j].setBackground(getDrawable(R.drawable.button6));
+                button[i][j].setBackground(getDrawable(R.drawable.button4));
             }
         } else if (i == 3) {
             if (j < 4) {
                 button[i][j].setBackground(getDrawable(R.drawable.button3));
             } else if (j >= 4 && j < 8) {
-                button[i][j].setBackground(getDrawable(R.drawable.button5));
+                button[i][j].setBackground(getDrawable(R.drawable.button4));
             } else {
-                button[i][j].setBackground(getDrawable(R.drawable.button0));
+                button[i][j].setBackground(getDrawable(R.drawable.button5));
             }
         } else if (i == 4) {
             if (j < 4) {
                 button[i][j].setBackground(getDrawable(R.drawable.button4));
             } else if (j >= 4 && j < 8) {
-                button[i][j].setBackground(getDrawable(R.drawable.button6));
+                button[i][j].setBackground(getDrawable(R.drawable.button5));
             } else {
-                button[i][j].setBackground(getDrawable(R.drawable.button1));
+                button[i][j].setBackground(getDrawable(R.drawable.button6));
             }
         } else if (i == 5) {
             if (j < 4) {
                 button[i][j].setBackground(getDrawable(R.drawable.button5));
             } else if (j >= 4 && j < 8) {
-                button[i][j].setBackground(getDrawable(R.drawable.button0));
+                button[i][j].setBackground(getDrawable(R.drawable.button6));
             } else {
-                button[i][j].setBackground(getDrawable(R.drawable.button2));
+                button[i][j].setBackground(getDrawable(R.drawable.button0));
             }
         } else if (i == 6) {
             if (j < 4) {
                 button[i][j].setBackground(getDrawable(R.drawable.button6));
             } else if (j >= 4 && j < 8) {
-                button[i][j].setBackground(getDrawable(R.drawable.button1));
+                button[i][j].setBackground(getDrawable(R.drawable.button0));
             } else {
-                button[i][j].setBackground(getDrawable(R.drawable.button3));
+                button[i][j].setBackground(getDrawable(R.drawable.button1));
             }
         }
         /* 随机色

@@ -1,4 +1,4 @@
-package com.example.personalcoursetable.Gson;
+package com.example.personalcoursetable.PersonalCourseTable;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import java.util.List;
  * 个人课表 Gson 类
  */
 
-public class Course {
+public class Gson_PersonalCourseTable {
     private String studentNum="";
     private String studentName="";
     private String termStartTime="";
