@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.view.View;
 
 import java.util.Random;
 
@@ -14,7 +15,7 @@ import java.util.Random;
  * Created by aaa on 2018/1/12.
  */
 
-public class Course extends android.support.v7.widget.AppCompatTextView {
+public class Course extends View {
     public int X = 0;//横纵坐标
     public int Y = 0;
     private int width = 0;//控件宽高
@@ -23,19 +24,20 @@ public class Course extends android.support.v7.widget.AppCompatTextView {
     private int currentHeight;
     private TextPaint textPaint = new TextPaint();
     private Paint backPaint = new Paint();
-    private float scale;//用以dp化px
     private String text;
     private boolean isShow = true;
-    private float canvasScaleUp = 0.3f;//放大动画缩放倍数
-//    private float canvasScaleDown=1f;
-//    private boolean isFirstHide=false;
+    private float canvasScaleUp = 0.2f;//放大动画缩放倍数
+    public static boolean isSignleColor=false;
+    private Context context;
+    private float canvasScaleDown=0.99f;
+    private boolean isFirstHide=false;
 
     public Course(Context context, int width, int height, String text) {
         super(context);
         this.width = width;
         this.height = height;
         this.text = text;
-        scale = context.getResources().getDisplayMetrics().density;
+        this.context=context;
         initialise();
     }
 
@@ -46,7 +48,11 @@ public class Course extends android.support.v7.widget.AppCompatTextView {
 
     public void setNull() {
         isShow = false;
-//        isFirstHide=true;
+        invalidate();
+    }
+
+    public void setFirstHide(boolean isFirstHide){
+        this.isFirstHide=isFirstHide;
         invalidate();
     }
 
@@ -63,20 +69,22 @@ public class Course extends android.support.v7.widget.AppCompatTextView {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        /*if(isFirstHide){
+        if(isFirstHide){
             if(canvasScaleDown>0f){
                 canvas.scale(canvasScaleDown,canvasScaleDown);
-                canvasScaleDown-=canvasScaleDown/8;
+                canvasScaleDown-=(1f-canvasScaleDown+0.2)/8;
                 postInvalidateDelayed(1);
                 return;
             }else {
                 isFirstHide=false;
+                setNull();
             }
-        }*/
+        }
         if (!isShow) {
             return;
         }
         if (canvasScaleUp <1f) {
+            canvas.translate((1f-canvasScaleUp)*width/2,(1f-canvasScaleUp)*height/2);
             canvas.scale(canvasScaleUp, canvasScaleUp);
             canvasScaleUp += canvasScaleUp /8;
             postInvalidateDelayed(1);
@@ -92,14 +100,17 @@ public class Course extends android.support.v7.widget.AppCompatTextView {
                 1.0f,
                 0.0f,
                 true);
+        canvas.save();
+        canvas.translate((width-(_dp(11))*4)/2,0);
         staticLayout.draw(canvas);
+        canvas.restore();
     }
 
     private void initialise() {
         {//画笔设置
             textPaint.setColor(Color.WHITE);
             textPaint.setAntiAlias(true);
-            textPaint.setTextSize(11 * scale + 0.5f);
+            textPaint.setTextSize(_dp(11));
 
             backPaint.setColor(color());
             backPaint.setAntiAlias(true);
@@ -120,6 +131,15 @@ public class Course extends android.support.v7.widget.AppCompatTextView {
         };
         Random random = new Random();
         int r = random.nextInt(colors.length - 1);
-        return colors[r];
+        if(isSignleColor){
+            return colors[1];
+        }else {
+            return colors[r];
+        }
+    }
+
+    private float _dp(float px){
+        float scale = context.getResources().getDisplayMetrics().density;
+        return px*scale+0.5f;
     }
 }

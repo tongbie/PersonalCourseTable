@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         Course courseButtion = (Course) view;
         int X = courseButtion.X, Y = courseButtion.Y;
-        if (!course[X][Y].getText().equals("")) {
+        if (!courseNameArray[X][Y].equals("")) {
             AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
             dialog.setTitle(courseNameArray[X][Y]);
             dialog.setMessage("课程时间：" + courseWeekArray[X][Y] + "\n上课地点：" + coursePlaceArray[X][Y] + "\n任课教师：" + courseTeacherArray[X][Y]);
@@ -134,7 +134,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         spaceLayoutParams.setMargins(_2dp, (int) getResources().getDimension(R.dimen._12dp), 0, 0);//设置边距
         for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 10; j++) {
+                Course.isSignleColor=true;
                 course[i][j] = new Course(this, courseWidth, _58dp, courseNameArray[i][j]);
+                Course.isSignleColor=false;
                 course[i][j].setLayoutParams(layoutParams);//设置大小
                 course[i][j].setPosition(i, j);
                 if (j == 4 || j == 8) {//设置分割线
@@ -284,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         courseWeekArray[X][Y] = "";
         coursePlaceArray[X][Y] = "";
         courseTeacherArray[X][Y] = "";
-        course[X][Y].setNull();
+        course[X][Y].setFirstHide(true);
         com.google.gson.Gson gson = new com.google.gson.Gson();
         CourseGson gsonPersonalCourseTable = gson.fromJson(JsonString, CourseGson.class);
         setJson(gsonPersonalCourseTable, X, Y, "", "", "", "");
