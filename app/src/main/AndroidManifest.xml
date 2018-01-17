@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.personalcoursetable">
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <!-- 读写权限 -->
+    package="com.example.bietong.personalcoursetable">
 
     <application
         android:allowBackup="true"
@@ -11,8 +8,8 @@
         android:label="课程表"
         android:roundIcon="@drawable/sign"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".PersonalCourseTable.Class_PersonalCourseTable">
+        android:theme="@style/StartTheme">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

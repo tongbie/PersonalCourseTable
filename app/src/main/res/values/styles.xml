@@ -8,4 +8,12 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="StartTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorStart</item>
+        <item name="colorPrimaryDark">@color/colorStart</item>
+        <item name="colorAccent">@color/colorStart</item>
+        <item name="android:windowBackground">@color/colorStart</item>
+    </style>
+
 </resources>
