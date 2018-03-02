@@ -77,13 +77,11 @@ public class Course extends View {
     }
 
     private void initialise() {
-        {//画笔设置
-            textPaint.setColor(Color.WHITE);
-            textPaint.setAntiAlias(true);
-            textPaint.setTextSize(dp(11));
-            backPaint.setColor(color());
-            backPaint.setAntiAlias(true);
-        }
+        textPaint.setColor(Color.WHITE);
+        textPaint.setAntiAlias(true);
+        textPaint.setTextSize(dp(11));
+        backPaint.setColor(color());
+        backPaint.setAntiAlias(true);
     }
 
     private int color() {
