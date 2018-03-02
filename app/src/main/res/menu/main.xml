@@ -8,4 +8,8 @@
     <item
         android:id="@+id/delete"
         android:title="删除" />
+
+    <item
+        android:id="@+id/exit"
+        android:title="退出编辑" />
 </menu>

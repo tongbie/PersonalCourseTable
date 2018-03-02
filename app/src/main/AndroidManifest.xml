@@ -9,7 +9,7 @@
         android:roundIcon="@drawable/sign"
         android:supportsRtl="true"
         android:theme="@style/StartTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".Table">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -8,6 +8,8 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 
 import java.util.Random;
 
@@ -20,39 +22,29 @@ public class Course extends View {
     public int Y = 0;
     private int width = 0;//控件宽高
     private int height = 0;
-    private int currentWidth;//当前宽高
-    private int currentHeight;
     private TextPaint textPaint = new TextPaint();
     private Paint backPaint = new Paint();
     private String text;
     private boolean isShow = true;
-    private float canvasScaleUp = 0.2f;//放大动画缩放倍数
-    public static boolean isSignleColor=false;
+    public static boolean isSignleColor = false;
     private Context context;
-    private float canvasScaleDown=0.99f;
-    private boolean isFirstHide=false;
 
     public Course(Context context, int width, int height, String text) {
         super(context);
         this.width = width;
         this.height = height;
         this.text = text;
-        this.context=context;
+        this.context = context;
         initialise();
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-        invalidate();
+        ScaleAnimation scaleAnimation
+                = new ScaleAnimation(0, 1, 0, 1,
+                Animation.RELATIVE_TO_SELF, 0.5F, Animation.RELATIVE_TO_SELF, 0.5F);
+        scaleAnimation.setDuration(300);
+        this.startAnimation(scaleAnimation);
     }
 
     public void setNull() {
         isShow = false;
-        invalidate();
-    }
-
-    public void setFirstHide(boolean isFirstHide){
-        this.isFirstHide=isFirstHide;
         invalidate();
     }
 
@@ -69,27 +61,8 @@ public class Course extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if(isFirstHide){
-            if(canvasScaleDown>0f){
-                canvas.scale(canvasScaleDown,canvasScaleDown);
-                canvasScaleDown-=(1f-canvasScaleDown+0.2)/8;
-                postInvalidateDelayed(1);
-                return;
-            }else {
-                isFirstHide=false;
-                setNull();
-            }
-        }
         if (!isShow) {
             return;
-        }
-        if (canvasScaleUp <1f) {
-            canvas.translate((1f-canvasScaleUp)*width/2,(1f-canvasScaleUp)*height/2);
-            canvas.scale(canvasScaleUp, canvasScaleUp);
-            canvasScaleUp += canvasScaleUp /8;
-            postInvalidateDelayed(1);
-        } else {
-            canvas.scale(1f, 1f);
         }
         canvas.drawRoundRect(0, 0, width, height, 15, 15, backPaint);
         StaticLayout staticLayout = new StaticLayout(
@@ -100,23 +73,17 @@ public class Course extends View {
                 1.0f,
                 0.0f,
                 true);
-        canvas.save();
-        canvas.translate((width-(_dp(11))*4)/2,0);
         staticLayout.draw(canvas);
-        canvas.restore();
     }
 
     private void initialise() {
         {//画笔设置
             textPaint.setColor(Color.WHITE);
             textPaint.setAntiAlias(true);
-            textPaint.setTextSize(_dp(11));
-
+            textPaint.setTextSize(dp(11));
             backPaint.setColor(color());
             backPaint.setAntiAlias(true);
         }
-        currentWidth = (int) width / 4;
-        currentHeight = (int) height / 4;
     }
 
     private int color() {
@@ -131,15 +98,15 @@ public class Course extends View {
         };
         Random random = new Random();
         int r = random.nextInt(colors.length - 1);
-        if(isSignleColor){
+        if (isSignleColor) {
             return colors[1];
-        }else {
+        } else {
             return colors[r];
         }
     }
 
-    private float _dp(float px){
+    private float dp(float px) {
         float scale = context.getResources().getDisplayMetrics().density;
-        return px*scale+0.5f;
+        return px * scale + 0.5f;
     }
 }

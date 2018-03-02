@@ -28,11 +28,9 @@ import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener {
+public class Table extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener {
     private Course course[][] = new Course[7][10];
     private LinearLayout.LayoutParams layoutParams;//布局参数
     private LinearLayout[] day = new LinearLayout[7];//每天LinearLayout
@@ -89,20 +87,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         addJson();//将JSON中的null填充
         getCourseArray();//获取课表数据
         setCourseLength();//设置课程长度
-        try {
+        addLongCourse();//添加长Button
+        initPopupWindow();//添加PopupWindow控件
+        initRefresh();//添加下拉刷新
+        /*try {
             Method method = this.getClass().getDeclaredMethod("addLongCourse", new Class[]{});//{}中为参数类型.class
             Object[] objects = new Object[]{};//获得参数Object
             method.invoke(this);//执行方法
-        } catch (NoSuchMethodException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-//        addLongCourse();//添加长Button
-        initPopupWindow();//添加PopupWindow控件
-        initRefresh();//添加下拉刷新
+        }*/
     }
 
     @Override/*按钮点击事件*/
@@ -110,9 +104,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Course courseButtion = (Course) view;
         int X = courseButtion.X, Y = courseButtion.Y;
         if (!courseNameArray[X][Y].equals("")) {
-            AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+            AlertDialog.Builder dialog = new AlertDialog.Builder(Table.this);
             dialog.setTitle(courseNameArray[X][Y]);
-            dialog.setMessage("课程时间：" + courseWeekArray[X][Y] + "\n上课地点：" + coursePlaceArray[X][Y] + "\n任课教师：" + courseTeacherArray[X][Y]);
+            dialog.setMessage("课程时间：" + courseWeekArray[X][Y] +
+                    "\n上课地点：" + coursePlaceArray[X][Y] +
+                    "\n任课教师：" + courseTeacherArray[X][Y]);
             dialog.setCancelable(true);
             dialog.show();
         }
@@ -132,11 +128,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         LinearLayout.LayoutParams spaceLayoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, _58dp);//布局参数
         spaceLayoutParams.setMargins(_2dp, (int) getResources().getDimension(R.dimen._12dp), 0, 0);//设置边距
+        Course.isSignleColor=true;
         for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 10; j++) {
-                Course.isSignleColor=true;
                 course[i][j] = new Course(this, courseWidth, _58dp, courseNameArray[i][j]);
-                Course.isSignleColor=false;
                 course[i][j].setLayoutParams(layoutParams);//设置大小
                 course[i][j].setPosition(i, j);
                 if (j == 4 || j == 8) {//设置分割线
@@ -150,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 day[i].addView(course[i][j]);
             }
         }
+        Course.isSignleColor=false;
     }
 
     /*展示选项卡*/
@@ -286,7 +282,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         courseWeekArray[X][Y] = "";
         coursePlaceArray[X][Y] = "";
         courseTeacherArray[X][Y] = "";
-        course[X][Y].setFirstHide(true);
+//        course[X][Y].setFirstHide(true);
+        course[X][Y].setNull();
         com.google.gson.Gson gson = new com.google.gson.Gson();
         CourseGson gsonPersonalCourseTable = gson.fromJson(JsonString, CourseGson.class);
         setJson(gsonPersonalCourseTable, X, Y, "", "", "", "");
@@ -409,7 +406,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
             JsonString = gson.toJson(courseGson);
-            sharedPreferences.edit().putString("PersonalCourseTable", JsonString).commit();
+//            sharedPreferences.edit().putString("PersonalCourseTable", JsonString).commit();
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "getCourseArray()\n", Toast.LENGTH_LONG).show();
             exception();
@@ -471,7 +468,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onRefresh() {
                 if (swipeRefreshLayout.getVerticalScrollbarPosition() == 0) {//判断页面是否在最上方
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(Table.this);
                     dialog.setCancelable(true);
                     dialog.setTitle("说明：");
                     dialog.setMessage("* 编辑模式下长按可进行修改\n* 同名课程取首节课的课程信息");
