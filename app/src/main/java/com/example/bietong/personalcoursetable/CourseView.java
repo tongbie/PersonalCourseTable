@@ -13,23 +13,19 @@ import android.view.animation.ScaleAnimation;
 
 import java.util.Random;
 
-/**
- * Created by aaa on 2018/1/12.
- */
-
-public class Course extends View {
-    public int X = 0;//横纵坐标
+public class CourseView extends View {
+    public int X = 0;
     public int Y = 0;
-    private int width = 0;//控件宽高
+    private int width = 0;
     private int height = 0;
     private TextPaint textPaint = new TextPaint();
-    private Paint backPaint = new Paint();
+    private Paint backgroundPaint = new Paint();
     private String text;
     private boolean isShow = true;
     public static boolean isSignleColor = false;
     private Context context;
 
-    public Course(Context context, int width, int height, String text) {
+    public CourseView(Context context, int width, int height, String text) {
         super(context);
         this.width = width;
         this.height = height;
@@ -64,7 +60,7 @@ public class Course extends View {
         if (!isShow) {
             return;
         }
-        canvas.drawRoundRect(0, 0, width, height, 15, 15, backPaint);
+        canvas.drawRoundRect(0, 0, width, height, 15, 15, backgroundPaint);
         StaticLayout staticLayout = new StaticLayout(
                 text,
                 textPaint,
@@ -80,20 +76,21 @@ public class Course extends View {
         textPaint.setColor(Color.WHITE);
         textPaint.setAntiAlias(true);
         textPaint.setTextSize(dp(11));
-        backPaint.setColor(color());
-        backPaint.setAntiAlias(true);
+        backgroundPaint.setColor(color());
+        backgroundPaint.setAntiAlias(true);
     }
 
+    private static int[] colors = new int[]{
+            Color.parseColor("#98d262"),//浅绿
+            Color.parseColor("#177cb0"),//蓝
+            Color.parseColor("#38b48b"),//绿
+            Color.parseColor("#64c6b9"),
+            Color.parseColor("#ee827c"),//粉红
+            Color.parseColor("#db8449"),
+            Color.parseColor("#867ba9"),
+    };
+
     private int color() {
-        int[] colors = new int[]{
-                Color.parseColor("#98d262"),//浅绿
-                Color.parseColor("#177cb0"),//蓝
-                Color.parseColor("#38b48b"),//绿
-                Color.parseColor("#64c6b9"),
-                Color.parseColor("#ee827c"),//粉红
-                Color.parseColor("#db8449"),
-                Color.parseColor("#867ba9"),
-        };
         Random random = new Random();
         int r = random.nextInt(colors.length - 1);
         if (isSignleColor) {
